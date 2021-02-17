@@ -98,6 +98,7 @@ public class Archer {
         return id;
     }
 
+
     /*
     The code below is their for your own convenience. You don't have include it in your report.
      */
@@ -136,5 +137,14 @@ public class Archer {
 
     private static int shootArrow() {
         return 1 + randomizer.nextInt(10);
+    }
+
+    /**
+     *
+     * @return strings of the attributes of the Archer
+     */
+    @Override
+    public String toString() {
+        return getId() + " (" + getTotalScore() + ") " + firstName + lastName;
     }
 }
