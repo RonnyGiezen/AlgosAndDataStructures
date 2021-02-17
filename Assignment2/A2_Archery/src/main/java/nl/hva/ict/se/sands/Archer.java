@@ -67,7 +67,15 @@ public class Archer {
      * @return the number of 10's for this archer.
      */
     public int getTens() {
-        return 0;
+        int numberOfTens = 0;
+        for (int i = 0; i < MAX_ROUNDS; i++){
+            for (int j = 0; j < MAX_ARROWS; j++) {
+                if (scores[i][j] == 10) {
+                    numberOfTens++;
+                }
+            }
+        }
+        return numberOfTens;
     }
 
     /**
@@ -75,7 +83,15 @@ public class Archer {
      * @return the number of 9's for this archer.
      */
     public int getNines() {
-        return 0;
+        int numberOfNines = 0;
+        for (int i = 0; i < MAX_ROUNDS; i++){
+            for (int j = 0; j < MAX_ARROWS; j++) {
+                if (scores[i][j] == 10) {
+                    numberOfNines++;
+                }
+            }
+        }
+        return numberOfNines;
     }
 
     public int getId() {
