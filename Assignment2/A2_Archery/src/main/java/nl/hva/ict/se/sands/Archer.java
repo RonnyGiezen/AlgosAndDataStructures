@@ -13,13 +13,13 @@ import java.util.*;
 public class Archer {
     public final static int MAX_ARROWS = 3;
     public final static int MAX_ROUNDS = 10;
-    private static Random randomizer = new Random();
-    private static int IDSTART = 135787; // start id, on every created archer it goed up by 1.
+    private static final Random randomizer = new Random();
+    private static int ID_START = 135787; // start id, on every created archer it goed up by 1.
 
-    private int id; // Once assigned a value this attribute is not allowed to change.
-    private String firstName;
-    private String lastName;
-    private int[][] scores;
+    private final int id; // Once assigned a value this attribute is not allowed to change.
+    private final String firstName;
+    private final String lastName;
+    private final int[][] scores;
 
     /**
      * Constructs a new instance of Archer and assigns a unique ID to the instance. The ID is not allowed to ever
@@ -33,7 +33,7 @@ public class Archer {
     protected Archer(String firstName, String lastName) {
         this.firstName = firstName;
         this.lastName = lastName;
-        id = IDSTART++;
+        id = ID_START++;
         scores = new int[MAX_ROUNDS][MAX_ARROWS];
     }
 
