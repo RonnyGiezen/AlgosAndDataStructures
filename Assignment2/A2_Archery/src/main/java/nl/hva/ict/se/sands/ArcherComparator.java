@@ -3,7 +3,6 @@ package nl.hva.ict.se.sands;
 import java.util.Comparator;
 
 public class ArcherComparator implements Comparator<Archer> {
-
     @Override
     public int compare(Archer o1, Archer o2) {
         // check if score is the same, if not we can directly return the score
