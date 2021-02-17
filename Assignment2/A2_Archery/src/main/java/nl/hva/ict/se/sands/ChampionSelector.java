@@ -13,6 +13,7 @@ public class ChampionSelector {
      * This method uses either selection sort or insertion sort for sorting the archers.
      */
     public static List<Archer> selInsSort(List<Archer> archers, Comparator<Archer> scoringScheme) {
+
         return archers;
     }
 
@@ -27,6 +28,8 @@ public class ChampionSelector {
      * This method uses the Java collections sort algorithm for sorting the archers.
      */
     public static List<Archer> collectionSort(List<Archer> archers, Comparator<Archer> scoringScheme) {
+        // using the Collections.sort() method and passing in an comparator
+        archers.sort(scoringScheme);
         return archers;
     }
 }
