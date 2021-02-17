@@ -11,9 +11,27 @@ import java.util.List;
 public class ChampionSelector {
     /**
      * This method uses either selection sort or insertion sort for sorting the archers.
+     * I used selection sort
      */
     public static List<Archer> selInsSort(List<Archer> archers, Comparator<Archer> scoringScheme) {
+        int archersLength = archers.size();
 
+        for (int i = 0; i < archersLength - 1; i++) {
+            // Find minimum element in unsorted array
+            int minIndex = i;
+            // loop through the list of archers
+            for (int j = i + 1; j < archersLength; j++) {
+                // check current archer against next archer in the list
+                if (scoringScheme.compare(archers.get(minIndex), archers.get(j)) > 0) {
+                    // if archer o2 is better set new index
+                    minIndex = j;
+                }
+            }
+            // swap the found minimum element with the first element
+            Archer tempBest = archers.get(minIndex);
+            archers.set(minIndex, archers.get(i));
+            archers.set(i, tempBest);
+        }
         return archers;
     }
 
