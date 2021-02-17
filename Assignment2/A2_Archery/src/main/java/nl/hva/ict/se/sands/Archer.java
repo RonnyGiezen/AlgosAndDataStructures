@@ -14,7 +14,7 @@ public class Archer {
     public final static int MAX_ARROWS = 3;
     public final static int MAX_ROUNDS = 10;
     private static Random randomizer = new Random();
-    private static int IDSTART = 135788;
+    private static int IDSTART = 135787; // start id, on every created archer it goed up by 1.
 
     private int id; // Once assigned a value this attribute is not allowed to change.
     private String firstName;
@@ -45,13 +45,21 @@ public class Archer {
      * @param points the points shot during the round.
      */
     public void registerScoreForRound(int round, int[] points) {
-        for (int point : points) {
-
+        // loop for all arrows in a round
+        for (int i = 0; i < MAX_ARROWS; i++) {
+            // set scores for each round based on the points list
+            scores[round][i] = points[i];
         }
     }
 
     public int getTotalScore() {
-        return 0;
+        int totalScore = 0;
+        for (int i = 0; i < MAX_ROUNDS; i++){
+            for (int j = 0; j < MAX_ARROWS; j++) {
+                totalScore += scores[i][j];
+            }
+        }
+        return totalScore;
     }
 
     /**
