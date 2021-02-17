@@ -39,6 +39,9 @@ public class ChampionSelector {
      * This method uses quick sort for sorting the archers.
      */
     public static List<Archer> quickSort(List<Archer> archers, Comparator<Archer> scoringScheme) {
+        // create instance of quicksort class and use the quickSort method to sort the list
+        QuickSort quickSort = new QuickSort();
+        quickSort.quickSort(archers, scoringScheme);
         return archers;
     }
 
