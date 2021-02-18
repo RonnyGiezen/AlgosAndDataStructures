@@ -58,7 +58,7 @@ public class Main {
      */
     public static void aLotOfArchers(){
         // Generate three identical lists of archers with a length og 5 mil
-        for (int i = 1; i < 20; i = i * 2){
+        for (int i = 100; i < 200; i = i * 2){
             // List one for the selection sort
             selectionSortArchers = Archer.generateArchers(i);
             // List two for the very quicksort
