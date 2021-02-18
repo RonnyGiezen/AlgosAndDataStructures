@@ -1,6 +1,7 @@
 package nl.hva.ict.se.sands;
 
 
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
@@ -18,7 +19,7 @@ public class QuickSort {
         int j = high;
 
         // set pivot for quick sort, the middle of the list
-        Archer pivot = archerList.get(low + (high-low) / 2);
+        Archer pivot = archerList.get(low + (high-low) / 2); //exception1 here
 
         // while low is lower or equal to length of list we loop through it
         while (i <= j) {
@@ -36,18 +37,18 @@ public class QuickSort {
             // that is smaller, we need to swap them.
             if (i <= j){
                 Archer temp = archerList.get(i);
-                archerList.set(i, archerList.get(j));
-                archerList.set(j, temp);
+                archerList.set(low, archerList.get(j));
+                archerList.set(high, temp);
                 i++;
                 j--;
             }
         }
         // Recursively sort elements before "partitioning" and after "partitioning"
         if (low < j){
-            sort(archerList, low, high);
+            sort(archerList, low, j); // exception2 here
         }
         if (high > i){
-            sort(archerList, low, high);
+            sort(archerList, i, high);
         }
 
     }
