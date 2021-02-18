@@ -6,11 +6,14 @@ import java.util.List;
 
 public class QuickSort {
 
+    private Comparator<Archer> scoringScheme;
+
     public  void quickSort(List<Archer> archerList, Comparator<Archer> scoringScheme){
-        sort(archerList, 0, (archerList.size() - 1), scoringScheme);
+        this.scoringScheme = scoringScheme;
+        sort(archerList, 0, (archerList.size() - 1));
     }
 
-    private void sort(List<Archer> archerList, int low, int high, Comparator<Archer> scoringScheme) {
+    private void sort(List<Archer> archerList, int low, int high) {
         int i = low;
         int j = high;
 
@@ -41,10 +44,10 @@ public class QuickSort {
         }
         // Recursively sort elements before "partitioning" and after "partitioning"
         if (low < j){
-            sort(archerList, low, high, scoringScheme);
+            sort(archerList, low, high);
         }
         if (high > i){
-            sort(archerList, low, high, scoringScheme);
+            sort(archerList, low, high);
         }
 
     }

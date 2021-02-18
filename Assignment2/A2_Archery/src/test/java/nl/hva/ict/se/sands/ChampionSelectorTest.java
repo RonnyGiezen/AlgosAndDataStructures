@@ -23,11 +23,15 @@ class ChampionSelectorTest {
     public void selInsSortAndCollectionSortResultInSameOrder() {
         List<Archer> unsortedArchersForSelIns = Archer.generateArchers(23);
         List<Archer> unsortedArchersForCollection = new ArrayList<>(unsortedArchersForSelIns);
+        List<Archer> unsortedArchersForQuickSort = new ArrayList<>(unsortedArchersForSelIns);
 
         List<Archer> sortedArchersSelIns = ChampionSelector.selInsSort(unsortedArchersForSelIns, comparator);
         List<Archer> sortedArchersCollection = ChampionSelector.collectionSort(unsortedArchersForCollection, comparator);
+        List<Archer> sortedArchersQuick = ChampionSelector.collectionSort(unsortedArchersForQuickSort, comparator);
 
         assertEquals(sortedArchersCollection, sortedArchersSelIns);
+        assertEquals(sortedArchersCollection, sortedArchersQuick);
+        assertEquals(sortedArchersSelIns, sortedArchersQuick);
     }
 
 }
