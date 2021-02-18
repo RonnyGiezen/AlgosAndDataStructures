@@ -20,7 +20,7 @@ class ChampionSelectorTest {
     }
 
     @Test
-    public void selInsSortAndCollectionSortResultInSameOrder() {
+    public void selInsSortQuickSortAndCollectionSortResultInSameOrder() {
         List<Archer> unsortedArchersForSelIns = Archer.generateArchers(23);
         List<Archer> unsortedArchersForCollection = new ArrayList<>(unsortedArchersForSelIns);
         List<Archer> unsortedArchersForQuickSort = new ArrayList<>(unsortedArchersForSelIns);
@@ -33,5 +33,7 @@ class ChampionSelectorTest {
         assertEquals(sortedArchersCollection, sortedArchersQuick);
         assertEquals(sortedArchersSelIns, sortedArchersQuick);
     }
+
+    // TODO write test for all sort methods
 
 }

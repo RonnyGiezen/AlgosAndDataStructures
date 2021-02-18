@@ -28,4 +28,6 @@ public class ArcherTest {
         assertTrue((Archer.class.getDeclaredField("id").getModifiers() & 0x00000010) != 0);
     }
 
+    // TODO write more test to cover whole Archer class
+
 }
