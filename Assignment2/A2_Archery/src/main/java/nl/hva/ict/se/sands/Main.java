@@ -13,20 +13,25 @@ public class Main {
     private static List<Archer> collectionSortArchers;
 
     public static void main(String[] args) {
+        // creating comparator for archers
         Comparator<Archer> comparator = new ArcherComparator();
+
         // create archers
         System.out.println("Creating lists of archers for you...");
         aLotOfArchers();
 
+        // printing that the sorting begins
         System.out.println("----------------------------------------------");
         System.out.println("Let the sorting games begin!");
+        System.out.println("----------------------------------------------");
+
         // check time spend for selection sort
         long beginTimeSelect = System.currentTimeMillis();
         ChampionSelector.selInsSort(selectionSortArchers, comparator);
         long endTimeSelect = System.currentTimeMillis();
 
+        // calculating total time spend sorting selection sort
         long totalTimeSelect = (beginTimeSelect - endTimeSelect);
-        System.out.println("----------------------------------------------");
         System.out.println("Selection sort took: " + totalTimeSelect  + " milliseconds" );
 
         // check time spend for collection sort
@@ -34,6 +39,7 @@ public class Main {
         ChampionSelector.collectionSort(collectionSortArchers, comparator);
         long endTimeColl = System.currentTimeMillis();
 
+        // calculating total time spend collection sort
         long totalTimeColl = (beginTimeColl - endTimeColl);
         System.out.println("Collection sort took: " + totalTimeColl  + " milliseconds" );
 
@@ -42,14 +48,9 @@ public class Main {
         ChampionSelector.quickSort(quickSortArchers, comparator);
         long endTimeQuick = System.currentTimeMillis();
 
+        // calculating time quicksort
         long totalTimeQuick = (beginTimeQuick - endTimeQuick);
-        // print results
-        System.out.println("----------------------------------------------");
         System.out.println("Quick sort took: " + totalTimeQuick  + " milliseconds" );
-
-
-
-
 
     }
 
