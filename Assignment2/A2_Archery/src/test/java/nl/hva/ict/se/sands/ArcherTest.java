@@ -1,5 +1,6 @@
 package nl.hva.ict.se.sands;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.lang.reflect.Constructor;
@@ -8,6 +9,12 @@ import java.util.*;
 import static org.junit.jupiter.api.Assertions.*;
 
 public class ArcherTest {
+    protected Archer archer;
+
+    @BeforeEach
+    public void createArcher() {
+        archer = new Archer("Ronny", "Giezen");
+    }
 
     @Test
     void archerIdsIncreaseCorrectly() {
@@ -30,7 +37,6 @@ public class ArcherTest {
 
     @Test
     void registerScoreForRound() {
-        Archer archer = new Archer("Ronny", "Giezen");
         int[] points = new int[3];
         // before points added should be 0
         assertEquals(0, archer.getTotalScore());
@@ -47,7 +53,6 @@ public class ArcherTest {
      */
     @Test
     void getTotalScore() {
-        Archer archer = new Archer("Ronny", "Giezen");
         int[] points = new int[3];
         // before points added should be 0
         assertEquals(0, archer.getTotalScore());
@@ -63,7 +68,6 @@ public class ArcherTest {
 
     @Test
     void getTens() {
-        Archer archer = new Archer("Ronny", "Giezen");
         int[] points = new int[3];
         points[0] = 10;
         archer.registerScoreForRound(1,points); // points is 10
@@ -81,7 +85,6 @@ public class ArcherTest {
 
     @Test
     void getNines() {
-        Archer archer = new Archer("Ronny", "Giezen");
         int[] points = new int[3];
         points[0] = 9;
         archer.registerScoreForRound(1,points); // points is 9
@@ -99,8 +102,10 @@ public class ArcherTest {
 
     @Test
     void testToString() {
+        String expected = "135788 (0) Ronny Giezen";
+        assertEquals(expected, archer.toString());
     }
 
-    // TODO write more test to cover whole Archer class
+
 
 }

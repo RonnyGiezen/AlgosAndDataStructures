@@ -150,6 +150,6 @@ public class Archer {
      */
     @Override
     public String toString() {
-        return getId() + " (" + getTotalScore() + ") " + firstName + lastName;
+        return getId() + " (" + getTotalScore() + ") " + firstName + " " + lastName;
     }
 }
