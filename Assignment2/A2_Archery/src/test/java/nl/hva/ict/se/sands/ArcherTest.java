@@ -42,8 +42,23 @@ public class ArcherTest {
 
     }
 
+    /**
+     * The test above al
+     */
     @Test
     void getTotalScore() {
+        Archer archer = new Archer("Ronny", "Giezen");
+        int[] points = new int[3];
+        // before points added should be 0
+        assertEquals(0, archer.getTotalScore());
+        // add points
+        points[0] = 10;
+        archer.registerScoreForRound(1,points);
+        // should be 10
+        assertEquals(10, archer.getTotalScore());
+        // add more point to see if it adds up
+        archer.registerScoreForRound(2, points);
+        assertEquals(20, archer.getTotalScore());
     }
 
     @Test
