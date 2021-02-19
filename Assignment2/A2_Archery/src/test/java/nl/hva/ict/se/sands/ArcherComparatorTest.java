@@ -9,6 +9,11 @@ import static org.junit.jupiter.api.Assertions.*;
 
 class ArcherComparatorTest {
     protected Comparator<Archer> comparator;
+    protected ArcherComparator testComparator;
+    protected Archer winner;
+    protected Archer loser;
+    protected int[] pointsWinner;
+    protected int[] pointsLoser;
 
     @BeforeEach
     public void createComparator() {
@@ -17,18 +22,17 @@ class ArcherComparatorTest {
         comparator = new ArcherComparator();
     }
 
+    @BeforeEach
+    public void createTestObjects() {
+        testComparator = new ArcherComparator();
+        winner = new Archer("Winner", "Winner chickendinner");
+        loser = new Archer("Loser", "Lost");
+        pointsWinner = new int[3];
+        pointsLoser = new int[3];
+    }
+
     @Test
     void compare() {
-        // create archers
-        Archer loserOnPoints = new Archer("Loser", "Points");
-        Archer winnerOnPoints = new Archer("Winner", "Points");
-        Archer loserOnTens = new Archer("Loser", "Tens");
-        Archer winnerOnTens = new Archer("Winner", "Tens");
-        Archer winnerOnNines = new Archer("Winner", "Nines");
-        Archer loserOnNines = new Archer("Winner", "Nines");
-        Archer winnerOnID = new Archer("Winner", "Id");
-        Archer loserOnID = new Archer("Loser", "Id");
-
         int[] points = new int[3];
         int[] tens = new int[3];
         int[] nines = new int[3];
@@ -38,30 +42,67 @@ class ArcherComparatorTest {
         nines[0] = 9;
 
         // insert points to winners and compare on point
-        winnerOnPoints.registerScoreForRound(1, tens);
-        loserOnPoints.registerScoreForRound(1, points);
-        assertEquals(2, comparator.compare(loserOnPoints, winnerOnPoints));
+        winner.registerScoreForRound(1, tens);
+        loser.registerScoreForRound(1, points);
+        assertEquals(2, comparator.compare(loser, winner));
 
         points[1] = 2;
 
-        winnerOnTens.registerScoreForRound(1, tens);
-        loserOnTens.registerScoreForRound(1, points);
-        assertEquals(1, comparator.compare(loserOnTens, winnerOnTens));
+        winner.registerScoreForRound(1, tens);
+        loser.registerScoreForRound(1, points);
+        assertEquals(1, comparator.compare(loser, winner));
 
         points[2] = 8;
         nines[1] = 9;
 
-        winnerOnNines.registerScoreForRound(1, nines);
-        loserOnNines.registerScoreForRound(1, points);
-        assertEquals(2, comparator.compare(loserOnNines, winnerOnNines));
+        winner.registerScoreForRound(1, nines);
+        loser.registerScoreForRound(1, points);
+        assertEquals(2, comparator.compare(loser, winner));
 
-        winnerOnID.registerScoreForRound(1, tens);
-        winnerOnID.registerScoreForRound(2, nines);
-        loserOnID.registerScoreForRound(1, tens);
-        loserOnID.registerScoreForRound(2, nines);
-        assertEquals(1, comparator.compare(loserOnID, winnerOnID));
+        winner.registerScoreForRound(1, tens);
+        winner.registerScoreForRound(2, nines);
+        loser.registerScoreForRound(1, tens);
+        loser.registerScoreForRound(2, nines);
+        assertEquals(1, comparator.compare(loser, winner));
 
 
 
+    }
+
+    @Test
+    void totalScore() {
+        pointsWinner[0] = 5;
+        pointsLoser[0] = 4;
+        winner.registerScoreForRound(1, pointsWinner);
+        loser.registerScoreForRound(1, pointsLoser);
+        assertEquals(1, testComparator.totalScore(loser, winner));
+    }
+
+    @Test
+    void checkTens() {
+        pointsWinner[0] = 5;
+        pointsWinner[1] = 10;
+        pointsLoser[0] = 9;
+        pointsLoser[1] = 6;
+        winner.registerScoreForRound(1, pointsWinner);
+        loser.registerScoreForRound(1, pointsLoser);
+        assertEquals(1, testComparator.checkTens(loser, winner));
+    }
+
+    @Test
+    void checkNines() {
+        pointsWinner[0] = 9;
+        pointsWinner[1] = 9;
+        pointsLoser[0] = 5;
+        pointsLoser[1] = 4;
+        pointsLoser[2] = 9;
+        winner.registerScoreForRound(1, pointsWinner);
+        loser.registerScoreForRound(1, pointsLoser);
+        assertEquals(1, testComparator.checkNines(loser, winner));
+    }
+
+    @Test
+    void checkId() {
+        assertEquals(1, testComparator.checkId(loser, winner));
     }
 }
