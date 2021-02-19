@@ -52,8 +52,13 @@ public class Archer {
         }
     }
 
+    /**
+     *
+     * @return totalScore the total score of all rounds
+     */
     public int getTotalScore() {
         int totalScore = 0;
+        // double loop through the two dimensional List
         for (int i = 0; i < MAX_ROUNDS; i++){
             for (int j = 0; j < MAX_ARROWS; j++) {
                 totalScore += scores[i][j];
