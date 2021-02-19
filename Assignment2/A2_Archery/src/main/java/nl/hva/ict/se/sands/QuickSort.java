@@ -19,7 +19,7 @@ public class QuickSort {
         int j = high;
 
         // set pivot for quick sort, the middle of the list
-        Archer pivot = archerList.get(low + (high-low) / 2); //exception1 here
+        Archer pivot = archerList.get(low + (high-low) / 2);
 
         // while low is lower or equal to length of list we loop through it
         while (i <= j) {
@@ -45,7 +45,7 @@ public class QuickSort {
         }
         // Recursively sort elements before "partitioning" and after "partitioning"
         if (low < j){
-            sort(archerList, low, j); // exception2 here
+            sort(archerList, low, j);
         }
         if (high > i){
             sort(archerList, i, high);
