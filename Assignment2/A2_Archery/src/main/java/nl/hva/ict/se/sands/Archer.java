@@ -91,7 +91,7 @@ public class Archer {
         int numberOfNines = 0;
         for (int i = 0; i < MAX_ROUNDS; i++){
             for (int j = 0; j < MAX_ARROWS; j++) {
-                if (scores[i][j] == 10) {
+                if (scores[i][j] == 9) {
                     numberOfNines++;
                 }
             }

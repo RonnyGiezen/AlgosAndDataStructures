@@ -81,6 +81,20 @@ public class ArcherTest {
 
     @Test
     void getNines() {
+        Archer archer = new Archer("Ronny", "Giezen");
+        int[] points = new int[3];
+        points[0] = 9;
+        archer.registerScoreForRound(1,points); // points is 9
+        // should be 10
+        assertEquals(1, archer.getNines());
+
+        // add more point to see if it adds up
+        archer.registerScoreForRound(2, points); // points is 18
+        assertEquals(2, archer.getNines());
+
+        points[1] = 10;
+        archer.registerScoreForRound(3, points); // points is 38
+        assertEquals(3, archer.getNines());
     }
 
     @Test
