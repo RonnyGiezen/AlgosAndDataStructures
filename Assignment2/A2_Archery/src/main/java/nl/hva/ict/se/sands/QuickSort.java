@@ -8,7 +8,7 @@ public class QuickSort {
 
     private Comparator<Archer> scoringScheme;
 
-    public  void quickSort(List<Archer> archerList, Comparator<Archer> scoringScheme){
+    public void quickSort(List<Archer> archerList, Comparator<Archer> scoringScheme){
         this.scoringScheme = scoringScheme;
         sort(archerList, 0, (archerList.size() - 1));
     }
@@ -22,6 +22,8 @@ public class QuickSort {
 
         // while low is lower or equal to length of list we loop through it
         while (i <= j) {
+            System.out.println(low);
+            System.out.println(high);
             // If it was an array of ints we would compare the left int item in the list with pivot
             // but here we have to check left archer with pivot archer
             while (scoringScheme.compare(archerList.get(i), pivot) < 0) {

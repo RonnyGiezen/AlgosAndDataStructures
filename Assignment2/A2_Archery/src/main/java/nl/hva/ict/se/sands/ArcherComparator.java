@@ -60,10 +60,7 @@ public class ArcherComparator implements Comparator<Archer> {
      * @return 1 if ID of archer 1 is lower that archer 2 (older) else -1
      */
     public int checkId(Archer o1, Archer o2) {
-        if (o2.getId() < o1.getId()){
-            return 1;
-        }
-        return -1;
+        return Integer.compare(o1.getId(), o2.getId());
     }
 
 }
