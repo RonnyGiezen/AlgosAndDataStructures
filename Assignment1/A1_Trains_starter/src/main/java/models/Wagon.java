@@ -1,6 +1,6 @@
 package models;
 
-public class Wagon {
+public abstract class Wagon {
     protected int id;                 // some unique ID of a Wagon
     private Wagon nextWagon;        // another wagon that is appended at the tail of this wagon
                                     // a.k.a. the successor of this wagon in a sequence
@@ -52,8 +52,8 @@ public class Wagon {
      */
     public Wagon getLastWagonAttached() {
         Wagon lastWagon = this;
-        while (hasNextWagon()) {
-            lastWagon = this.nextWagon;
+        while (lastWagon.hasNextWagon()) {
+            lastWagon = lastWagon.nextWagon;
         }
         return lastWagon;
     }
@@ -88,6 +88,7 @@ public class Wagon {
         }
         // attach this wagon to its new predecessor (sustaining the invariant propositions).
         this.previousWagon = newPreviousWagon;
+        this.previousWagon.nextWagon = this;
     }
 
     /**
@@ -95,8 +96,11 @@ public class Wagon {
      * no action if this wagon has no previous wagon attached.
      */
     public void detachFromPrevious() {
-        // TODO detach this wagon from its predecessors (sustaining the invariant propositions).
-
+        // detach this wagon from its predecessors (sustaining the invariant propositions).
+        if (this.hasPreviousWagon()) {
+            this.previousWagon.nextWagon = null;
+            this.previousWagon = null;
+        }
     }
 
     /**
@@ -104,8 +108,11 @@ public class Wagon {
      * no action if this wagon has no succeeding next wagon attached.
      */
     public void detachTail() {
-        // TODO detach this wagon from its successors (sustaining the invariant propositions).
-
+        // detach this wagon from its successors (sustaining the invariant propositions).
+        if (this.hasNextWagon()) {
+            this.nextWagon.previousWagon = null;
+            this.nextWagon = null;
+        }
     }
 
     /**
@@ -115,10 +122,12 @@ public class Wagon {
      * @param newPreviousWagon
      */
     public void reAttachTo(Wagon newPreviousWagon) {
-        // TODO detach any existing connections that will be rearranged
-
-        // TODO attach this wagon to its new predecessor (sustaining the invariant propositions).
-
+        // detach any existing connections that will be rearranged
+        this.previousWagon.nextWagon = null;
+        this.previousWagon = null;
+        // attach this wagon to its new predecessor (sustaining the invariant propositions).
+        newPreviousWagon.nextWagon = this;
+        this.previousWagon = newPreviousWagon;
     }
 
     /**
@@ -126,8 +135,14 @@ public class Wagon {
      * Reconnect the subsequence of its predecessors with the subsequence of its successors, if any.
      */
     public void removeFromSequence() {
-        // TODO
-
+        if (this.nextWagon != null){
+            this.nextWagon.previousWagon = this.previousWagon;
+        }
+        if (this.previousWagon != null) {
+            this.previousWagon.nextWagon = this.nextWagon;
+        }
+        this.previousWagon = null;
+        this.nextWagon = null;
     }
 
 
@@ -139,9 +154,22 @@ public class Wagon {
      */
     public Wagon reverseSequence() {
         // TODO provide a recursive implementation
+        Wagon newFirst = this;
 
-        return null;
+        if (newFirst.previousWagon == null || newFirst.nextWagon == null) {
+            return newFirst;
+        }
+
+        Wagon temp = newFirst.previousWagon;
+        newFirst.previousWagon = newFirst.nextWagon;
+        newFirst.nextWagon = temp;
+        newFirst = newFirst.previousWagon;
+
+        return reverseSequence();
     }
 
-    // TODO
+    @Override
+    public String toString() {
+        return String.format("[Wagon-%d]", id);
+    }
 }
