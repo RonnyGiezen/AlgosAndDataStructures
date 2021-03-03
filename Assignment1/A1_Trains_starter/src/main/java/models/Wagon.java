@@ -63,21 +63,31 @@ public class Wagon {
      *          return 1 if no wagons have been attached to this wagon.
      */
     public int getSequenceLength() {
-        // TODO provide a recursive solution
-
-        return 1;
+        int sequence = 1;
+        if (this.hasNextWagon()) {
+            sequence += this.nextWagon.getSequenceLength();
+        }
+        return sequence;
     }
 
     /**
      * attaches this wagon at the tail of a given prevWagon.
-     * @param newPreviousWagon
+     * @param newPreviousWagon the new previousWagon
      * @throws RuntimeException if this wagon already has been appended to a wagon.
      * @throws RuntimeException if prevWagon already has got a wagon appended.
      */
     public void attachTo(Wagon newPreviousWagon) {
-        // TODO verify the exceptions
-
-        // TODO attach this wagon to its new predecessor (sustaining the invariant propositions).
+        // verify the exceptions
+        if (newPreviousWagon.hasNextWagon()){
+            String msg = "this wagon has already been appended to another wagon";
+            throw new IllegalArgumentException(msg);
+        }
+        if (this.hasPreviousWagon()) {
+            String msg = "This wagon already has a predecessor";
+            throw new IllegalArgumentException(msg);
+        }
+        // attach this wagon to its new predecessor (sustaining the invariant propositions).
+        this.previousWagon = newPreviousWagon;
     }
 
     /**
