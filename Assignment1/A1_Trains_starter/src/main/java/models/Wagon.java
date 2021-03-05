@@ -31,6 +31,14 @@ public abstract class Wagon {
         return previousWagon;
     }
 
+    public void setNextWagon(Wagon nextWagon) {
+        this.nextWagon = nextWagon;
+    }
+
+    public void setPreviousWagon(Wagon previousWagon) {
+        this.previousWagon = previousWagon;
+    }
+
     /**
      * @return  whether this wagon has a wagon appended at the tail
      */
@@ -88,7 +96,7 @@ public abstract class Wagon {
         }
         // attach this wagon to its new predecessor (sustaining the invariant propositions).
         this.previousWagon = newPreviousWagon;
-        this.previousWagon.nextWagon = this;
+        this.previousWagon.setNextWagon(this);
     }
 
     /**

@@ -179,8 +179,10 @@ public class TrainTest {
     @Test
     public void T17_ShouldSplitTrainCorrectly() {
         assertTrue(passengerTrain.splitAtPosition(5, trainWithoutWagons));
+
         assertEquals(3, trainWithoutWagons.getNumberOfWagons());
         assertEquals(4, passengerTrain.getNumberOfWagons());
+
     }
 
     @Test
@@ -217,14 +219,14 @@ public class TrainTest {
     public void T19_checkImplementationOfIterableInterface() {
         int sumIds = 0;
         // Uncomment the following lines once you have implemented the Iterable interface!
-//        for (Wagon w: trainWithoutWagons) {
-//            sumIds += w.getId();
-//        }
-//        assertEquals(0, sumIds);
-//
-//        for (Wagon w: freightTrain) {
-//            sumIds += w.getId();
-//        }
+        for (Object w: trainWithoutWagons) {
+            sumIds += ((Wagon) w).getId();
+        }
+        assertEquals(0, sumIds);
+
+        for (Object w: freightTrain) {
+            sumIds += ((Wagon) w).getId();
+        }
         assertEquals(27006, sumIds);
     }
 }

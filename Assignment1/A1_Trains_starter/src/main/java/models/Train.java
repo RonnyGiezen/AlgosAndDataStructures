@@ -1,15 +1,14 @@
 package models;
 
-import java.util.ArrayList;
+
 import java.util.Iterator;
-import java.util.List;
+
 
 public class Train implements Iterable {
     private String origin;
     private String destination;
     private Locomotive engine;
     private Wagon firstWagon;
-    private List<Wagon> wagons = new ArrayList<>();
 
     /* Representation invariants:
         firstWagon == null || firstWagon.previousWagon == null
@@ -24,15 +23,15 @@ public class Train implements Iterable {
 
     /* three helper methods that are usefull in other methods */
     public boolean hasWagons() {
-        return this.firstWagon != null;
+        return firstWagon != null;
     }
 
     public boolean isPassengerTrain() {
-        return this.firstWagon instanceof PassengerWagon;
+        return firstWagon instanceof PassengerWagon;
     }
 
     public boolean isFreightTrain() {
-        return this.firstWagon instanceof FreightWagon;
+        return firstWagon instanceof FreightWagon;
     }
 
     public Locomotive getEngine() {
@@ -43,6 +42,16 @@ public class Train implements Iterable {
         return firstWagon;
     }
 
+    // check if wagon is already attached to the train
+    public boolean isOnTrain(Wagon wagon) {
+        return this.findWagonById(wagon.getId()) != null;
+    }
+
+    // check if wagon is of the same type as the train
+    public boolean wagonMatchesTrainType(Wagon wagon){
+        return wagon instanceof PassengerWagon && this.isPassengerTrain() || wagon instanceof FreightWagon && this.isFreightTrain();
+    }
+
     /**
      * Replaces the current sequence of wagons (if any) in the train
      * by the given new sequence of wagons (if any)
@@ -50,25 +59,28 @@ public class Train implements Iterable {
      * @param newSequence   the new sequence of wagons (can be null)
      */
     public void setFirstWagon(Wagon newSequence) {
-        // TODO
+        this.firstWagon = null;
+        this.firstWagon = newSequence;
     }
 
     /**
      * @return  the number of Wagons connected to the train
      */
     public int getNumberOfWagons() {
-        // TODO
-
-        return 0;
+        if (this.firstWagon == null) {
+            return 0;
+        }
+        return this.firstWagon.getSequenceLength();
     }
 
     /**
      * @return  the last wagon attached to the train
      */
     public Wagon getLastWagonAttached() {
-        // TODO
-
-        return null;
+        if (this.firstWagon == null) {
+            return null;
+        }
+        return this.firstWagon.getLastWagonAttached();
     }
 
     /**
@@ -76,9 +88,15 @@ public class Train implements Iterable {
      *          (return 0 for a freight train)
      */
     public int getTotalNumberOfSeats() {
-        // TODO
+        int seats = 0;
 
-        return 0;
+        if (isPassengerTrain()) {
+            for (Object wagon : this) {
+                seats += ((PassengerWagon) wagon).getNumberOfSeats();
+            }
+        }
+        return seats;
+
     }
 
     /**
@@ -88,9 +106,16 @@ public class Train implements Iterable {
      *
      */
     public int getTotalMaxWeight() {
-        // TODO
+        int weight = 0;
 
-        return 0;
+        if (isFreightTrain()) {
+            for (Object wagon : this) {
+                weight += ((FreightWagon) wagon).getMaxWeight();
+            }
+            return weight;
+        }
+        return weight;
+
     }
 
      /**
@@ -100,9 +125,24 @@ public class Train implements Iterable {
      *          (return null if the position is not valid for this train)
      */
     public Wagon findWagonAtPosition(int position) {
-        // TODO
+        Wagon currentWagon = firstWagon;
+        int numberOfWagonsFound = 1;
 
-        return null;
+        if(firstWagon == null) return null;
+
+        for (int i = 1; i < position; i++) {
+            if (currentWagon.hasNextWagon()) {
+                currentWagon = currentWagon.getNextWagon();
+                numberOfWagonsFound++;
+            }
+        }
+
+        if (numberOfWagonsFound == position) {
+            return currentWagon;
+        } else {
+            return null;
+        }
+
     }
 
     /**
@@ -112,9 +152,19 @@ public class Train implements Iterable {
      *          (return null if no wagon was found with the given wagonId)
      */
     public Wagon findWagonById(int wagonId) {
-        // TODO
+        int position = 1;
+
+        if (firstWagon == null) return null;
+
+        for (Object wagon : this) {
+            if (((Wagon) wagon).getId() == wagonId) {
+                return ((Wagon) wagon);
+            }
+            position++;
+        }
 
         return null;
+
     }
 
     /**
@@ -125,9 +175,14 @@ public class Train implements Iterable {
      * @return
      */
     public boolean canAttach(Wagon sequence) {
-        // TODO
+        if (this.hasWagons() && !this.isOnTrain(sequence) && this.wagonMatchesTrainType(sequence)){
+            int maxWagons = this.getEngine().getMaxWagons();
+            int waggonsAttachedToTrain = this.getFirstWagon().getSequenceLength();
+            int waggonsAttachedToWagon = sequence.getSequenceLength();
 
-        return false;
+            return (waggonsAttachedToTrain + waggonsAttachedToWagon) <= maxWagons;
+        }
+        return !this.hasWagons();
     }
 
     /**
@@ -138,8 +193,16 @@ public class Train implements Iterable {
      * @return  whether the attachment could be completed successfully
      */
     public boolean attachToRear(Wagon sequence) {
-        // TODO
+        if (this.canAttach(sequence)){
+            if (!this.hasWagons()) {
+                this.setFirstWagon(sequence);
+            }
+            else {
+                this.firstWagon.getLastWagonAttached().setNextWagon(sequence);
+            }
+            return true;
 
+        }
         return false;
     }
 
@@ -151,7 +214,19 @@ public class Train implements Iterable {
      * @return  whether the insertion could be completed successfully
      */
     public boolean insertAtFront(Wagon sequence) {
-        // TODO
+        if (this.canAttach(sequence)){
+            if (!this.hasWagons()){
+                this.setFirstWagon(sequence);
+            }
+            else {
+                this.firstWagon.setPreviousWagon(sequence.getLastWagonAttached());
+                sequence.getLastWagonAttached().setNextWagon(this.firstWagon);
+                this.setFirstWagon(sequence);
+
+
+            }
+            return true;
+        }
 
         return false;
     }
@@ -165,7 +240,20 @@ public class Train implements Iterable {
      * @return  whether the insertion could be completed successfully
      */
     public boolean insertAtPosition(int position, Wagon sequence) {
-        // TODO
+        if (this.canAttach(sequence) && (position <= this.getNumberOfWagons() || position == 1 && !this.hasWagons())){
+            Wagon temp = this.findWagonAtPosition(position);
+
+            if (!this.hasWagons()){
+                this.setFirstWagon(sequence);
+            }
+            else if (temp != null){
+                sequence.setPreviousWagon(temp.getPreviousWagon());
+                temp.detachFromPrevious();
+                sequence.getLastWagonAttached().setNextWagon(temp);
+                temp.setPreviousWagon(sequence.getLastWagonAttached());
+            }
+            return true;
+        }
 
         return false;
     }
@@ -182,7 +270,12 @@ public class Train implements Iterable {
      */
     public boolean moveOneWagon(int wagonId, Train toTrain) {
         // TODO
-
+        Wagon toRemove = this.findWagonById(wagonId);
+        if (toRemove != null && toTrain.canAttach(toRemove)) {
+            toRemove.removeFromSequence();
+            toTrain.attachToRear(toRemove);
+            return true;
+        }
         return false;
      }
 
@@ -197,9 +290,19 @@ public class Train implements Iterable {
      * @return  whether the move could be completed successfully
      */
     public boolean splitAtPosition(int position, Train toTrain) {
-        // TODO
+        if (this.getNumberOfWagons() != 0) {
+            Wagon toRemove = this.findWagonAtPosition(position);
+            if (this.isOnTrain(toRemove) && toTrain.canAttach(toRemove)) {
+                this.findWagonAtPosition(position - 1).detachTail();
+                toTrain.attachToRear(toRemove);
+                return true;
+
+            }
+        }
 
         return false;
+
+
     }
 
     /**
@@ -215,9 +318,39 @@ public class Train implements Iterable {
     }
 
     @Override
-    public Iterator iterator() {
-        return null;
+    public Iterator<Wagon> iterator() {
+        return new Iterator<Wagon>() {
+
+            Wagon current = firstWagon;
+
+            // Will return true if the current wagon in the iteration is not null
+            @Override
+            public boolean hasNext() {
+                return current != null;
+            }
+
+            // Sets current wagon to the next wagon and returns the current wagon
+            @Override
+            public Wagon next() {
+                Wagon wagon = current;
+                current = current.getNextWagon();
+                return wagon;
+            }
+        };
     }
 
-    // TODO
+
+    @Override
+    public String toString() {
+        StringBuilder result = new StringBuilder();
+        result.append(engine.toString());
+        Wagon next = this.getFirstWagon();
+        while (next != null) {
+            result.append(next.toString());
+            next = next.getNextWagon();
+        }
+        result.append(String.format(" with %d wagons and %d seats from %s to %s", getNumberOfWagons(), getTotalNumberOfSeats(), origin, destination));
+        return result.toString();
+    }
+
 }
