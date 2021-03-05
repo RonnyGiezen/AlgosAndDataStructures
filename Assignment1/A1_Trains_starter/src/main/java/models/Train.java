@@ -396,7 +396,7 @@ public class Train implements Iterable {
             builder.append(nextWagon.toString());
             nextWagon = nextWagon.getNextWagon();
         }
-        builder.append(String.format(" with %d wagons and %d seats from %s to %s", getNumberOfWagons(), getTotalNumberOfSeats(), origin, destination));
+        builder.append(String.format(" with %d wagons from %s to %s", getNumberOfWagons(), origin, destination));
         return builder.toString();
     }
 
