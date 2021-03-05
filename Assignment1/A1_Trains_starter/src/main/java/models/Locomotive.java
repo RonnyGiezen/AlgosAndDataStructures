@@ -1,10 +1,14 @@
 package models;
 
 public class Locomotive {
-    private int locNumber;
-    private int maxWagons;
+    private final int locNumber;
+    private final int maxWagons;
 
-
+    /**
+     *
+     * @param locNumber the number/id of a locomotive
+     * @param maxWagons the amount of wagons a locomotive can take
+     */
     public Locomotive(int locNumber, int maxWagons) {
         this.locNumber = locNumber;
         this.maxWagons = maxWagons;

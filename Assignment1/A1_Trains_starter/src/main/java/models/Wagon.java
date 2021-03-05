@@ -3,21 +3,23 @@ package models;
 public abstract class Wagon {
     protected int id;                 // some unique ID of a Wagon
     private Wagon nextWagon;        // another wagon that is appended at the tail of this wagon
-                                    // a.k.a. the successor of this wagon in a sequence
-                                    // set to null if no successor is connected
+    // a.k.a. the successor of this wagon in a sequence
+    // set to null if no successor is connected
     private Wagon previousWagon;    // another wagon that is prepended at the front of this wagon
-                                    // a.k.a. the predecessor of this wagon in a sequence
-                                    // set to null if no predecessor is connected
+    // a.k.a. the predecessor of this wagon in a sequence
+    // set to null if no predecessor is connected
 
 
     // representation invariant propositions:
     // tail-connection-invariant:   wagon.nextWagon == null or wagon == wagon.nextWagon.previousWagon
     // front-connection-invariant:  wagon.previousWagon == null or wagon = wagon.previousWagon.nextWagon
 
-    public Wagon (int wagonId) {
+    /**
+     * @param wagonId the if of a wagon
+     */
+    protected Wagon(int wagonId) {
         this.id = wagonId;
     }
-
 
     public int getId() {
         return id;
@@ -40,14 +42,14 @@ public abstract class Wagon {
     }
 
     /**
-     * @return  whether this wagon has a wagon appended at the tail
+     * @return whether this wagon has a wagon appended at the tail
      */
     public boolean hasNextWagon() {
         return this.nextWagon != null;
     }
 
     /**
-     * @return  whether this wagon has a wagon prepended at the front
+     * @return whether this wagon has a wagon prepended at the front
      */
     public boolean hasPreviousWagon() {
         return this.previousWagon != null;
@@ -55,11 +57,13 @@ public abstract class Wagon {
 
     /**
      * finds the last wagon of the sequence of wagons attached to this wagon
-     * if no wagons are attached return this wagon itselves
-     * @return  the wagon found
+     * if no wagons are attached return this wagon selves
+     *
+     * @return the wagon found
      */
     public Wagon getLastWagonAttached() {
         Wagon lastWagon = this;
+        // loop while wagon has next, stops if it does not
         while (lastWagon.hasNextWagon()) {
             lastWagon = lastWagon.nextWagon;
         }
@@ -67,11 +71,12 @@ public abstract class Wagon {
     }
 
     /**
-     * @return  the length of the sequence of wagons starting with this wagon
-     *          return 1 if no wagons have been attached to this wagon.
+     * @return the length of the sequence of wagons starting with this wagon
+     * return 1 if no wagons have been attached to this wagon.
      */
     public int getSequenceLength() {
         int sequence = 1;
+        // loop through until wagon has no next anymore count all wagons
         if (this.hasNextWagon()) {
             sequence += this.nextWagon.getSequenceLength();
         }
@@ -80,13 +85,14 @@ public abstract class Wagon {
 
     /**
      * attaches this wagon at the tail of a given prevWagon.
+     *
      * @param newPreviousWagon the new previousWagon
      * @throws RuntimeException if this wagon already has been appended to a wagon.
      * @throws RuntimeException if prevWagon already has got a wagon appended.
      */
     public void attachTo(Wagon newPreviousWagon) {
         // verify the exceptions
-        if (newPreviousWagon.hasNextWagon()){
+        if (newPreviousWagon.hasNextWagon()) {
             String msg = "this wagon has already been appended to another wagon";
             throw new IllegalArgumentException(msg);
         }
@@ -127,10 +133,11 @@ public abstract class Wagon {
      * attaches this wagon at the tail of a given newPreviousWagon.
      * if required, first detaches this wagon from its current predecessor
      * and/or detaches the newPreviousWagon from its current successor
-     * @param newPreviousWagon
+     *
+     * @param newPreviousWagon reattach the wagon to the new previous wagon
      */
     public void reAttachTo(Wagon newPreviousWagon) {
-        // detach any existing connections that will be rearranged
+        // detach previous wagon from this en detach this from previous wagon
         this.previousWagon.nextWagon = null;
         this.previousWagon = null;
         // attach this wagon to its new predecessor (sustaining the invariant propositions).
@@ -143,7 +150,7 @@ public abstract class Wagon {
      * Reconnect the subsequence of its predecessors with the subsequence of its successors, if any.
      */
     public void removeFromSequence() {
-        if (this.nextWagon != null){
+        if (this.nextWagon != null) {
             this.nextWagon.previousWagon = this.previousWagon;
         }
         if (this.previousWagon != null) {
@@ -158,22 +165,38 @@ public abstract class Wagon {
      * reverses the order in the sequence of wagons from this Wagon until its final successor.
      * The reversed sequence is attached again to the predecessor of this Wagon, if any.
      * no action if this Wagon has no succeeding next wagon attached.
+     *
      * @return the new start Wagon of the reversed sequence (with is the former last Wagon of the original sequence)
      */
     public Wagon reverseSequence() {
-        // TODO provide a recursive implementation
-        Wagon newFirst = this;
+        // only reverses all wagons....
+        if (this.previousWagon != null) {
+            this.previousWagon.nextWagon = reverseRecursive(this);
+            reverseRecursive(this).previousWagon = this.previousWagon;
+        }
+        return reverseRecursive(this);
+    }
 
-        if (newFirst.previousWagon == null || newFirst.nextWagon == null) {
-            return newFirst;
+    /**
+     * @param sequence the sequence of wagons you want to reverse
+     * @return the new "head" of the sequence
+     */
+    public static Wagon reverseRecursive(Wagon sequence) {
+        if (sequence == null) {
+            return null;
         }
 
-        Wagon temp = newFirst.previousWagon;
-        newFirst.previousWagon = newFirst.nextWagon;
-        newFirst.nextWagon = temp;
-        newFirst = newFirst.previousWagon;
+        if (sequence.nextWagon == null) {
+            sequence.previousWagon = null;
+            return sequence;
+        }
 
-        return reverseSequence();
+        Wagon newHead = reverseRecursive(sequence.nextWagon);
+        sequence.nextWagon.nextWagon = sequence;
+        sequence.previousWagon = sequence.nextWagon;
+        sequence.nextWagon = null;
+
+        return newHead;
     }
 
     @Override
