@@ -224,6 +224,7 @@ public class Train implements Iterable {
                 // add sequence to the last wagon
                 this.firstWagon.getLastWagonAttached().setNextWagon(sequence);
                 // set last wagon of train to previous of sequence wagon
+                sequence.detachFromPrevious();
                 sequence.setPreviousWagon(this.firstWagon.getLastWagonAttached());
             }
             return true;
