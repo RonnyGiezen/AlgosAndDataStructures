@@ -15,7 +15,7 @@ public abstract class Wagon {
     // front-connection-invariant:  wagon.previousWagon == null or wagon = wagon.previousWagon.nextWagon
 
     /**
-     * @param wagonId the if of a wagon
+     * @param wagonId the constructor of a wagon
      */
     protected Wagon(int wagonId) {
         this.id = wagonId;
