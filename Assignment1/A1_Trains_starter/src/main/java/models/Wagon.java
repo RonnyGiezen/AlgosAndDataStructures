@@ -185,12 +185,13 @@ public abstract class Wagon {
         if (sequence == null) {
             return null;
         }
-
+        // if the next wagon is null we found the last of the sequence
         if (sequence.nextWagon == null) {
+            // set at first wagon of the sequence
             sequence.previousWagon = null;
             return sequence;
         }
-
+        // otherwise we continue recursive and keep swapping the next and previous
         Wagon newHead = reverseRecursive(sequence.nextWagon);
         sequence.nextWagon.nextWagon = sequence;
         sequence.previousWagon = sequence.nextWagon;
