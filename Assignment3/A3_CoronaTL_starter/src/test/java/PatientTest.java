@@ -24,7 +24,7 @@ class PatientTest {
 
     @Test
     void T01_checkPatientCanBePrinted() {
-        assertEquals("1003AM(1976-03-21)@10:10:35[DRY_COUGH,FEVER]", patient0.toString());
-        assertEquals("1000OM(1938-01-11)@10:00:48[DRY_COUGH,TIREDNESS,FEVER,SORE_MUSCLES,DIARRHOEA]", patient1.toString());
+        assertEquals("1003AM(1976-03-21)@10:10:35[DRY_COUGH, FEVER]", patient0.toString());
+        assertEquals("1000OM(1938-01-11)@10:00:48[DRY_COUGH, TIREDNESS, FEVER, SORE_MUSCLES, DIARRHOEA]", patient1.toString());
     }
 }

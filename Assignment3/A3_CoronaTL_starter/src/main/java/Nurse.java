@@ -16,7 +16,7 @@ public class Nurse  {
     /**
      * Creates a new Nurse record for simulating and tracking sampling of patients at the Test Lane
      * @param name          some arbitrary name for reporting
-     * @param startTime     The start time of the work day; the earlies time available for the next patient
+     * @param startTime     The start time of the work day; the earliest time available for the next patient
      * @param randomizer    used to generate reproducible simulation results
      */
     public Nurse(String name, LocalTime startTime, Random randomizer) {

@@ -1,5 +1,8 @@
 import java.time.LocalDate;
 import java.time.LocalTime;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Random;
 
 public class Patient {
@@ -115,6 +118,20 @@ public class Patient {
         this.sampledBy = sampledBy;
     }
 
-    // TODO more methods or local classes related to the patient
+    // more methods or local classes related to the patient
 
+    public String printSymptoms(){
+        List<Symptom> symptomsPrint = new ArrayList<>();
+        for (int i = 0; i < this.symptoms.length; i++) {
+            if (this.symptoms[i]){
+                symptomsPrint.add(Symptom.values()[i]);
+            }
+        }
+       return symptomsPrint.toString();
+    }
+
+    @Override
+    public String toString() {
+        return zipCode + "(" + dateOfBirth + ")@" + arrivedAt + printSymptoms() ;
+    }
 }

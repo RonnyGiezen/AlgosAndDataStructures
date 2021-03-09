@@ -19,7 +19,7 @@ public class CoronaTestLane {
 
     private Random randomizer;              // used for generation of test data and to produce reproducible simulation results
 
-    private Comparator<Patient> comparePrio = new PatientComparator();
+    private final Comparator<Patient> comparePrio = new PatientComparator();
 
     /**
      * Instantiates a corona test line for a given day of work
@@ -31,7 +31,7 @@ public class CoronaTestLane {
         this.closingTime = closingTime;
         this.workFinished = openingTime;
         this.randomizer = new Random(0);
-        System.out.printf("\nCorona test lane simulation between %s and %s\n\n", openingTime, closingTime);
+        System.out.printf("%nCorona test lane simulation between %s and %s%n%n", openingTime, closingTime);
     }
 
     /**
@@ -44,7 +44,7 @@ public class CoronaTestLane {
      */
     public void configure(int numNurses, int numPatients, double priorityFraction, long seed) {
         randomizer = new Random(seed);
-        System.out.printf("Configuring test lane with %d nurse(s) and %d patients (%.0f%% priority); seed=%d.\n",
+        System.out.printf("Configuring test lane with %d nurse(s) and %d patients (%.0f%% priority); seed=%d.%n",
                 numNurses, numPatients, 100*priorityFraction, seed);
 
         // Configure the nurses
@@ -77,8 +77,8 @@ public class CoronaTestLane {
 
         // maintain the patients queue by priority and arrival time
         // TODO This priority queue needs a proper way of determining the priority for the patients
-        Queue<Patient> waitingPatients = new PriorityQueue<>();
-        this.patients.sort(this.comparePrio);
+        Queue<Patient> waitingPatients = new PriorityQueue<>(this.maxQueueLength, this.comparePrio);
+
         // reset availability of the nurses
         for (Nurse nurse : nurses) {
             nurse.setAvailableAt(openingTime);
@@ -88,12 +88,12 @@ public class CoronaTestLane {
 
         // maintain a queue of nurses ordered by earliest time of availability
         // TODO This priority queue needs a proper way of determining the next available nurse
-        Queue<Nurse> availableNurses = new PriorityQueue<>();
+        Queue<Nurse> availableNurses = new PriorityQueue<>(this.maxQueueLength);
         availableNurses.addAll(nurses);
 
         // ensure patients are processed in order of arrival
         // TODO Ensure that the patients are ordered by arrival time
-//        patients.sort(...);
+        this.patients.sort(this.comparePrio);
 
         // track the max queuelength as part of the simulation
         maxQueueLength = 0;
