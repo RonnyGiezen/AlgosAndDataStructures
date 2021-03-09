@@ -1,4 +1,6 @@
+import java.time.Duration;
 import java.time.LocalTime;
+import java.time.temporal.ChronoUnit;
 import java.util.*;
 
 public class CoronaTestLane {
@@ -19,7 +21,8 @@ public class CoronaTestLane {
 
     private Random randomizer;              // used for generation of test data and to produce reproducible simulation results
 
-    private final Comparator<Patient> comparePrio = new PatientTimeComparator();
+    private final Comparator<Patient> timeComparator = new PatientTimeComparator();
+    private final Comparator<Patient> prioComparator = new PatientPrioComparator();
 
     /**
      * Instantiates a corona test line for a given day of work
@@ -76,8 +79,8 @@ public class CoronaTestLane {
         // interleaved by nurses inviting patients from the waiting queue to have their sample taken from their nose...
 
         // maintain the patients queue by priority and arrival time
-        // TODO This priority queue needs a proper way of determining the priority for the patients
-        Queue<Patient> waitingPatients = new PriorityQueue<>(this.maxQueueLength, this.comparePrio);
+        // This priority queue needs a proper way of determining the priority for the patients
+        Queue<Patient> waitingPatients = new PriorityQueue<>(this.maxQueueLength, this.prioComparator);
 
         // reset availability of the nurses
         for (Nurse nurse : nurses) {
@@ -93,7 +96,7 @@ public class CoronaTestLane {
 
         // ensure patients are processed in order of arrival
         // TODO Ensure that the patients are ordered by arrival time
-        this.patients.sort(this.comparePrio);
+        this.patients.sort(this.timeComparator);
 
         // track the max queueing as part of the simulation
         maxQueueLength = 0;
@@ -145,6 +148,22 @@ public class CoronaTestLane {
         // TODO calculate the aggregated statistics from the simulation
         //  i.e. time the work was finished
         //       average and maximum waiting times
+
+        // Loop through all patients to get the maximum waiting time for both prio patients and non prio patients
+        for (Patient patient: this.patients){
+            if (patient.isHasPriority()){
+                int timeDifferencePrio = (int) patient.getArrivedAt().until(patient.getSampledAt(), ChronoUnit.MINUTES);
+                if (timeDifferencePrio > this.maxPriorityWaitTime) {
+                    this.maxPriorityWaitTime = timeDifferencePrio;
+                }
+            }
+            else if (!patient.isHasPriority()){
+                int timeDifference = (int) patient.getArrivedAt().until(patient.getSampledAt(), ChronoUnit.MINUTES);
+                if (timeDifference > this.maxPriorityWaitTime) {
+                    this.maxPriorityWaitTime = timeDifference;
+                }
+            }
+        }
 
     }
 
