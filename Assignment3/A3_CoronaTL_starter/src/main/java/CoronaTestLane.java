@@ -19,7 +19,7 @@ public class CoronaTestLane {
 
     private Random randomizer;              // used for generation of test data and to produce reproducible simulation results
 
-    private final Comparator<Patient> comparePrio = new PatientComparator();
+    private final Comparator<Patient> comparePrio = new PatientTimeComparator();
 
     /**
      * Instantiates a corona test line for a given day of work
@@ -95,7 +95,7 @@ public class CoronaTestLane {
         // TODO Ensure that the patients are ordered by arrival time
         this.patients.sort(this.comparePrio);
 
-        // track the max queuelength as part of the simulation
+        // track the max queueing as part of the simulation
         maxQueueLength = 0;
 
         // determine the first available nurse
@@ -167,7 +167,7 @@ public class CoronaTestLane {
         // TODO report the maximum length of the queue at any time
 
         // TODO report average and maximum wait times for regular and priority patients (if any)
-        System.out.printf("Wait times:        Average:  Maximum:\n");
+        System.out.printf("Wait times:        Average:  Maximum:%n");
 
     }
 
