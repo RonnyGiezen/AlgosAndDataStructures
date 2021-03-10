@@ -186,7 +186,10 @@ public class CoronaTestLane {
         //  numPatients,
         //  average sample time for taking the nose sample,
         //  and percentage of opening hours of the Test Lane actually spent on taking samples
-
+        for (Nurse nurse: this.nurses) {
+            String workLoad = ((nurse.getTotalSamplingTime() / (this.closingTime.compareTo(this.openingTime))) * 100) + "%";
+            System.out.println(nurse.toString() + workLoad );
+        }
 
 
         // TODO report the time all nurses had finished all sampling work

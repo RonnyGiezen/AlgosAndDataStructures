@@ -80,4 +80,12 @@ public class Nurse {
 
     // TODO other methods relevant to nurses
 
+    public int avgSampleTime() {
+        return this.totalSamplingTime / this.numPatientsSampled;
+    }
+
+    @Override
+    public String toString() {
+        return name + "     " + numPatientsSampled + "       " + avgSampleTime() + "      " ;
+    }
 }
