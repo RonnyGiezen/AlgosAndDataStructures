@@ -1,8 +1,9 @@
 import java.time.LocalTime;
+import java.util.Comparator;
 import java.util.Random;
 
-// TODO
-public class Nurse  {
+
+public class Nurse {
     private final static int SAMPLE_TIME_MIN = 60;
     private final static int SAMPLE_TIME_MAX = 160;
 
@@ -38,7 +39,7 @@ public class Nurse  {
         // this time varies between 60 and 159 seconds as is advised from GGD experience.
         int sampleDuration = SAMPLE_TIME_MIN + randomizer.nextInt(SAMPLE_TIME_MAX - SAMPLE_TIME_MIN);
 
-        // TODO update patient and nurse simulation data
+        // update patient and nurse simulation data
         patient.setSampledAt(startTime);
         patient.setSampledBy(this);
         //  calculate and set the new availableAt time of the nurse

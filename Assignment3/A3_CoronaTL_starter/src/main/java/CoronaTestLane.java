@@ -17,12 +17,13 @@ public class CoronaTestLane {
     private int maxPriorityWaitTime;        // the maximum wait time of priority patients today
     private double averageRegularWaitTime;  // the average wait time of regular patients today
     private double averagePriorityWaitTime; // the average wait time of priority patients today
-    private final LocalTime workFinished;         // the time when all nurses have finished work with no more waiting patients
+    private LocalTime workFinished;         // the time when all nurses have finished work with no more waiting patients
 
     private Random randomizer;              // used for generation of test data and to produce reproducible simulation results
 
     private final Comparator<Patient> timeComparator = new PatientTimeComparator();
     private final Comparator<Patient> prioComparator = new PatientPrioComparator();
+    private final Comparator<Nurse> nurseComparator = new NurseComparator();
 
     /**
      * Instantiates a corona test line for a given day of work
@@ -80,7 +81,7 @@ public class CoronaTestLane {
 
         // maintain the patients queue by priority and arrival time
         // This priority queue needs a proper way of determining the priority for the patients
-        Queue<Patient> waitingPatients = new PriorityQueue<>(this.maxQueueLength, this.prioComparator);
+        Queue<Patient> waitingPatients = new PriorityQueue<>(this.prioComparator);
 
         // reset availability of the nurses
         for (Nurse nurse : nurses) {
@@ -90,12 +91,12 @@ public class CoronaTestLane {
         }
 
         // maintain a queue of nurses ordered by earliest time of availability
-        // TODO This priority queue needs a proper way of determining the next available nurse
-        Queue<Nurse> availableNurses = new PriorityQueue<>(this.maxQueueLength);
+        // This priority queue needs a proper way of determining the next available nurse
+        Queue<Nurse> availableNurses = new PriorityQueue<>(this.nurseComparator);
         availableNurses.addAll(nurses);
 
         // ensure patients are processed in order of arrival
-        // TODO Ensure that the patients are ordered by arrival time
+        // Ensure that the patients are ordered by arrival time
         this.patients.sort(this.timeComparator);
 
         // track the max queueing as part of the simulation
@@ -108,7 +109,7 @@ public class CoronaTestLane {
         for (Patient patient: patients) {
             // let nurses handle patients on the queue, if any
             // until the time of the next available nurse is later than the patient who just arrived
-            while (waitingPatients.size() > 0 && nextAvailableNurse.getAvailableAt().compareTo(patient.getArrivedAt()) <= 0) {
+            while (!waitingPatients.isEmpty() && nextAvailableNurse.getAvailableAt().compareTo(patient.getArrivedAt()) <= 0) {
                 // handle the next patient from the queue
                 Patient nextPatient = waitingPatients.poll();
 
@@ -130,10 +131,14 @@ public class CoronaTestLane {
 
             // keep track of the maximum queue length
             maxQueueLength = Integer.max(maxQueueLength, waitingPatients.size());
+
+
+
+
         }
 
         // process the remaining patients on the queue, same as above
-        while (waitingPatients.size() > 0) {
+        while (!waitingPatients.isEmpty()) {
             Patient nextPatient = waitingPatients.poll();
             LocalTime startTime = nextAvailableNurse.getAvailableAt().isAfter(nextPatient.getArrivedAt()) ?
                     nextAvailableNurse.getAvailableAt() :
@@ -141,15 +146,18 @@ public class CoronaTestLane {
             nextAvailableNurse.samplePatient(nextPatient, startTime);
             availableNurses.add(nextAvailableNurse);
             nextAvailableNurse = availableNurses.poll();
+
+            // set worked finished with new available time (Added by Ronny)
+            workFinished = nextAvailableNurse.getAvailableAt();
         }
 
         // all patients are underway
 
-        // TODO calculate the aggregated statistics from the simulation
+        // calculate the aggregated statistics from the simulation
         //  i.e. time the work was finished
         //       average and maximum waiting times
 
-        // Loop through all patients to get the maximum waiting time for both prio patients and non prio patients
+        // Loop through all patients to get the maximum waiting time for both prio patients and non prio patients (Added by Ronny)
         for (Patient patient: this.patients){
             if (patient.isHasPriority()){
                 int timeDifferencePrio = (int) patient.getArrivedAt().until(patient.getSampledAt(), ChronoUnit.MINUTES);
@@ -159,8 +167,8 @@ public class CoronaTestLane {
             }
             else if (!patient.isHasPriority()){
                 int timeDifference = (int) patient.getArrivedAt().until(patient.getSampledAt(), ChronoUnit.MINUTES);
-                if (timeDifference > this.maxPriorityWaitTime) {
-                    this.maxPriorityWaitTime = timeDifference;
+                if (timeDifference > this.averagePriorityWaitTime) {
+                    this.averagePriorityWaitTime = timeDifference;
                 }
             }
         }
