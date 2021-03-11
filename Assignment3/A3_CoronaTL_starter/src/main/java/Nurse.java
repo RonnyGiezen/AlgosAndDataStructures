@@ -43,9 +43,9 @@ public class Nurse {
         patient.setSampledAt(startTime);
         patient.setSampledBy(this);
         //  calculate and set the new availableAt time of the nurse
-        this.numPatientsSampled++;
-        this.setAvailableAt(startTime.plusSeconds(sampleDuration));
-        this.totalSamplingTime += sampleDuration;
+        numPatientsSampled++;
+        setAvailableAt(startTime.plusSeconds(sampleDuration));
+        totalSamplingTime += sampleDuration;
 
 
     }
@@ -80,12 +80,15 @@ public class Nurse {
 
     // TODO other methods relevant to nurses
 
-    public int avgSampleTime() {
+    public double avgSampleTime() {
+        if (this.totalSamplingTime == 0 || this.numPatientsSampled == 0){
+            return 0;
+        }
         return this.totalSamplingTime / this.numPatientsSampled;
     }
 
     @Override
     public String toString() {
-        return name + "     " + numPatientsSampled + "       " + avgSampleTime() + "      " ;
+        return name + "         " + numPatientsSampled +  String.format("              %.2f    ", avgSampleTime()) ;
     }
 }

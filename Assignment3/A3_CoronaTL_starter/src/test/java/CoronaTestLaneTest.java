@@ -125,6 +125,7 @@ class CoronaTestLaneTest {
                 maxLocalTime(lane.getNurses().get(0).getAvailableAt(), lane.getNurses().get(1).getAvailableAt()),
                 "This cross-check should always hold for 2 nurses");
 
+
         // check number of patients sampled
         assertEquals(5, lane.getNurses().get(0).getNumPatientsSampled() + lane.getNurses().get(1).getNumPatientsSampled(),
                 "This cross-check should always hold for 2 nurses");

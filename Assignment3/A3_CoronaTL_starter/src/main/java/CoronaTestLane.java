@@ -19,6 +19,10 @@ public class CoronaTestLane {
     private double averagePriorityWaitTime; // the average wait time of priority patients today
     private LocalTime workFinished;         // the time when all nurses have finished work with no more waiting patients
 
+    // added for stats
+    private double totalRegularWaitTime;
+    private double totalPriorityWaitTime;
+
     private Random randomizer;              // used for generation of test data and to produce reproducible simulation results
 
     private final Comparator<Patient> timeComparator = new PatientTimeComparator();
@@ -147,8 +151,6 @@ public class CoronaTestLane {
             availableNurses.add(nextAvailableNurse);
             nextAvailableNurse = availableNurses.poll();
 
-            // set worked finished with new available time (Added by Ronny)
-            workFinished = nextAvailableNurse.getAvailableAt();
         }
 
         // all patients are underway
@@ -157,18 +159,28 @@ public class CoronaTestLane {
         //  i.e. time the work was finished
         //       average and maximum waiting times
 
-        // Loop through all patients to get the maximum waiting time for both prio patients and non prio patients (Added by Ronny)
+        // set new available time same for all nurses
+        for (Nurse nurse: this.nurses){
+            nurse.setAvailableAt(nextAvailableNurse.getAvailableAt());
+        }
+
+        // set end time lane
+        this.workFinished = nextAvailableNurse.getAvailableAt();
+
+        // Loop through all patients to get the maximum waiting time for both prio patients and non prio patients
+
         for (Patient patient: this.patients){
+
             if (patient.isHasPriority()){
-                int timeDifferencePrio = (int) patient.getArrivedAt().until(patient.getSampledAt(), ChronoUnit.MINUTES);
-                if (timeDifferencePrio > this.maxPriorityWaitTime) {
-                    this.maxPriorityWaitTime = timeDifferencePrio;
+                this.totalPriorityWaitTime += patient.totalWaitTimeSeconds();
+                if (patient.totalWaitTimeSeconds() > this.maxPriorityWaitTime) {
+                    this.maxPriorityWaitTime = (int) patient.totalWaitTimeSeconds();
                 }
             }
             else if (!patient.isHasPriority()){
-                int timeDifference = (int) patient.getArrivedAt().until(patient.getSampledAt(), ChronoUnit.MINUTES);
-                if (timeDifference > this.averagePriorityWaitTime) {
-                    this.averagePriorityWaitTime = timeDifference;
+                this.totalRegularWaitTime += patient.totalWaitTimeSeconds();
+                if (patient.totalWaitTimeSeconds() > this.averagePriorityWaitTime) {
+                    this.maxRegularWaitTime = (int) patient.totalWaitTimeSeconds();
                 }
             }
         }
@@ -182,22 +194,27 @@ public class CoronaTestLane {
         System.out.println("Simulation results per nurse:");
         System.out.println("    Name: #Patients:    Avg. sample time: Workload:");
 
-        // TODO report per nurse:
+        //  TODO report per nurse:
         //  numPatients,
         //  average sample time for taking the nose sample,
         //  and percentage of opening hours of the Test Lane actually spent on taking samples
-        for (Nurse nurse: this.nurses) {
-            String workLoad = ((nurse.getTotalSamplingTime() / (this.closingTime.compareTo(this.openingTime))) * 100) + "%";
-            System.out.println(nurse.toString() + workLoad );
+        for (Nurse nurse: nurses) {
+            double timeOpen = this.workFinished.toSecondOfDay() - this.openingTime.toSecondOfDay();
+            double workLoad = (nurse.getTotalSamplingTime() / timeOpen) * 100;
+            System.out.println(nurse.toString() + String.format("%.0f", workLoad) + "%" );
         }
 
 
         // TODO report the time all nurses had finished all sampling work
-
+        System.out.println("Work finished at " + this.workFinished);
         // TODO report the maximum length of the queue at any time
 
         // TODO report average and maximum wait times for regular and priority patients (if any)
         System.out.printf("Wait times:        Average:  Maximum:%n");
+
+        System.out.println("\n");
+        System.out.println("-------------------------------------------------------------------");
+        System.out.println("\n");
 
     }
 

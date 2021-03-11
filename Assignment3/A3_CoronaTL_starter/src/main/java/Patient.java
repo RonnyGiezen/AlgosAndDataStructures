@@ -120,6 +120,10 @@ public class Patient {
 
     // more methods or local classes related to the patient
 
+    public double totalWaitTimeSeconds(){
+        return sampledAt.toSecondOfDay() - arrivedAt.toSecondOfDay();
+    }
+
     public String printSymptoms(){
         List<Symptom> symptomsPrint = new ArrayList<>();
         for (int i = 0; i < this.symptoms.length; i++) {
