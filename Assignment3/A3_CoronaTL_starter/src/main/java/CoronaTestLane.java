@@ -22,6 +22,8 @@ public class CoronaTestLane {
     // added for stats
     private double totalRegularWaitTime;
     private double totalPriorityWaitTime;
+    private int totalRegularPatients;
+    private int totalPriorityPatients;
 
     private Random randomizer;              // used for generation of test data and to produce reproducible simulation results
 
@@ -93,6 +95,14 @@ public class CoronaTestLane {
             nurse.setNumPatientsSampled(0);
             nurse.setTotalSamplingTime(0);
         }
+
+        // resetting statistics data
+        this.totalRegularPatients = 0;
+        this.totalPriorityPatients = 0;
+        this.totalRegularWaitTime = 0.0;
+        this.totalPriorityWaitTime = 0.0;
+        this.maxRegularWaitTime = 0;
+        this.maxPriorityWaitTime = 0;
 
         // maintain a queue of nurses ordered by earliest time of availability
         // This priority queue needs a proper way of determining the next available nurse
@@ -173,13 +183,15 @@ public class CoronaTestLane {
 
             if (patient.isHasPriority()){
                 this.totalPriorityWaitTime += patient.totalWaitTimeSeconds();
+                this.totalPriorityPatients++;
                 if (patient.totalWaitTimeSeconds() > this.maxPriorityWaitTime) {
                     this.maxPriorityWaitTime = (int) patient.totalWaitTimeSeconds();
                 }
             }
             else if (!patient.isHasPriority()){
                 this.totalRegularWaitTime += patient.totalWaitTimeSeconds();
-                if (patient.totalWaitTimeSeconds() > this.averagePriorityWaitTime) {
+                this.totalRegularPatients++;
+                if (patient.totalWaitTimeSeconds() > this.maxRegularWaitTime) {
                     this.maxRegularWaitTime = (int) patient.totalWaitTimeSeconds();
                 }
             }
@@ -212,6 +224,10 @@ public class CoronaTestLane {
 
         // TODO report average and maximum wait times for regular and priority patients (if any)
         System.out.printf("Wait times:        Average:  Maximum:%n");
+        System.out.printf("Regular patients:      %.2f        %d%n", this.totalRegularWaitTime / this.totalRegularPatients, this.maxRegularWaitTime);
+        if (this.totalPriorityPatients > 0){
+            System.out.printf("Priority patients:      %.2f        %d%n", this.totalPriorityWaitTime / this.totalPriorityPatients, this.maxPriorityWaitTime);
+        }
 
         // make the printing a little bit prettier
         System.out.println("\n");
