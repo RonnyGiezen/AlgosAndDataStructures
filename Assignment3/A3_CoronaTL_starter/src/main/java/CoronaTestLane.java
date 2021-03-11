@@ -219,10 +219,10 @@ public class CoronaTestLane {
 
         // report the time all nurses had finished all sampling work
         System.out.println("Work finished at " + this.workFinished);
-        // TODO report the maximum length of the queue at any time
+        // report the maximum length of the queue at any time
         System.out.println("Maximum patient queue length " + this.maxQueueLength);
 
-        // TODO report average and maximum wait times for regular and priority patients (if any)
+        // report average and maximum wait times for regular and priority patients (if any)
         System.out.printf("Wait times:        Average:  Maximum:%n");
         System.out.printf("Regular patients:      %.2f        %d%n", this.totalRegularWaitTime / this.totalRegularPatients, this.maxRegularWaitTime);
         if (this.totalPriorityPatients > 0){
