@@ -194,12 +194,12 @@ public class CoronaTestLane {
         System.out.println("Simulation results per nurse:");
         System.out.println("    Name: #Patients:    Avg. sample time: Workload:");
 
-        //  TODO report per nurse:
+        //  report per nurse:
         //  numPatients,
         //  average sample time for taking the nose sample,
         //  and percentage of opening hours of the Test Lane actually spent on taking samples
         for (Nurse nurse: nurses) {
-            double timeOpen = this.workFinished.toSecondOfDay() - this.openingTime.toSecondOfDay();
+            double timeOpen = this.closingTime.toSecondOfDay() - this.openingTime.toSecondOfDay();
             double workLoad = (nurse.getTotalSamplingTime() / timeOpen) * 100;
             System.out.println(nurse.toString() + String.format("%.0f", workLoad) + "%" );
         }
@@ -212,6 +212,7 @@ public class CoronaTestLane {
         // TODO report average and maximum wait times for regular and priority patients (if any)
         System.out.printf("Wait times:        Average:  Maximum:%n");
 
+        // make the printing a little bit prettier
         System.out.println("\n");
         System.out.println("-------------------------------------------------------------------");
         System.out.println("\n");
