@@ -1,6 +1,4 @@
-import java.time.Duration;
 import java.time.LocalTime;
-import java.time.temporal.ChronoUnit;
 import java.util.*;
 
 public class CoronaTestLane {
@@ -19,11 +17,11 @@ public class CoronaTestLane {
     private double averagePriorityWaitTime; // the average wait time of priority patients today
     private LocalTime workFinished;         // the time when all nurses have finished work with no more waiting patients
 
-    // added for stats
-    private double totalRegularWaitTime;
-    private double totalPriorityWaitTime;
-    private int totalRegularPatients;
-    private int totalPriorityPatients;
+    // added for stats by Ronny
+    private double totalRegularWaitTime; // the total queue length for regular patients
+    private double totalPriorityWaitTime; // the total queue length for prio patients
+    private int totalRegularPatients; // total amount of regular patients
+    private int totalPriorityPatients; // total amount of priority patients
 
     private Random randomizer;              // used for generation of test data and to produce reproducible simulation results
 
@@ -283,7 +281,8 @@ public class CoronaTestLane {
      */
     public Map<Patient.Symptom, String> zipAreasWithHighestPatientPercentageBySymptom(Map<String, Integer> patientsByZipArea) {
         // create, populate and return the result map
-        Map<Patient.Symptom, String> highestPatientBySympton = new TreeMap<>();
+        // create tree map, so we get it in order
+        Map<Patient.Symptom, String> highestPatientBySymptom = new TreeMap<>();
 
         for (Patient.Symptom symptom : Patient.Symptom.values()){
             double zipHighestPercentage = 0;
@@ -312,10 +311,10 @@ public class CoronaTestLane {
 
             }
             String codeWithAmount = String.format(" %s %.0f%%", zipHighest, zipHighestPercentage);
-            highestPatientBySympton.put(symptom, codeWithAmount);
+            highestPatientBySymptom.put(symptom, codeWithAmount);
         }
 
-        return highestPatientBySympton;
+        return highestPatientBySymptom;
     }
 
     public List<Patient> getPatients() {
