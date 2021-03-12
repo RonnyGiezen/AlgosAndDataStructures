@@ -258,8 +258,8 @@ public class CoronaTestLane {
     public Map<String, Integer> patientsByZipArea() {
 
         // create, populate and return the result map
-        // create hashmap, we dont need it in certain order so we use a hashmap
-        Map<String, Integer> patientsByZip = new HashMap<>();
+        // create treemap, in test it is in order...
+        Map<String, Integer> patientsByZip = new TreeMap<>();
 
         for (Patient patient : patients){
             String code = patient.getZipCode().substring(0,4);
@@ -273,6 +273,11 @@ public class CoronaTestLane {
         return patientsByZip;
     }
 
+    /**
+     *
+     * @param patientsByZipArea map of amount of patient per zip area
+     * @return a map with highest percentage by symptom
+     */
     public Map<Patient.Symptom, String> zipAreasWithHighestPatientPercentageBySymptom(Map<String, Integer> patientsByZipArea) {
 
         // TODO create, populate and return the result map
