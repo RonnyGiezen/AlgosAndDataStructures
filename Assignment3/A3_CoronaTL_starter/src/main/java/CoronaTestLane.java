@@ -257,10 +257,20 @@ public class CoronaTestLane {
      */
     public Map<String, Integer> patientsByZipArea() {
 
-        // TODO create, populate and return the result map
+        // create, populate and return the result map
+        // create hashmap, we dont need it in certain order so we use a hashmap
+        Map<String, Integer> patientsByZip = new HashMap<>();
 
+        for (Patient patient : patients){
+            String code = patient.getZipCode().substring(0,4);
+            // check if the code is already in the map
+            patientsByZip.computeIfPresent(code, (key, value) -> value += 1);
+            // if code is absent insert into map
+            patientsByZip.putIfAbsent(code, 1);
 
-        return null;
+        }
+
+        return patientsByZip;
     }
 
     public Map<Patient.Symptom, String> zipAreasWithHighestPatientPercentageBySymptom(Map<String, Integer> patientsByZipArea) {
