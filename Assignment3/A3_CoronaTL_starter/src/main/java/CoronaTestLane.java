@@ -197,6 +197,9 @@ public class CoronaTestLane {
             }
         }
 
+        this.averageRegularWaitTime = this.totalRegularWaitTime / this.totalRegularPatients;
+        this.averagePriorityWaitTime = this.totalPriorityWaitTime / this.totalPriorityPatients;
+
     }
 
     /**
@@ -224,9 +227,9 @@ public class CoronaTestLane {
 
         // report average and maximum wait times for regular and priority patients (if any)
         System.out.printf("Wait times:        Average:  Maximum:%n");
-        System.out.printf("Regular patients:      %.2f        %d%n", this.totalRegularWaitTime / this.totalRegularPatients, this.maxRegularWaitTime);
+        System.out.printf("Regular patients:      %.2f        %d%n", this.averageRegularWaitTime, this.maxRegularWaitTime);
         if (this.totalPriorityPatients > 0){
-            System.out.printf("Priority patients:      %.2f        %d%n", this.totalPriorityWaitTime / this.totalPriorityPatients, this.maxPriorityWaitTime);
+            System.out.printf("Priority patients:      %.2f        %d%n", this.averagePriorityWaitTime, this.maxPriorityWaitTime);
         }
 
         // make the printing a little bit prettier
