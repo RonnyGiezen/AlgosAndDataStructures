@@ -34,6 +34,5 @@ class ChampionSelectorTest {
         assertEquals(sortedArchersSelIns, sortedArchersQuick);
     }
 
-    // TODO write test for all sort methods
 
 }
