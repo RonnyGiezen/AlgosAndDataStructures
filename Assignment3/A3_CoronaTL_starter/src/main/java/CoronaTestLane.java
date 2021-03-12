@@ -7,7 +7,7 @@ public class CoronaTestLane {
     private List<Nurse> nurses;         // all nurses working at the test lane today
     private final LocalTime openingTime;      // start time of sampling at the test lane today
     private final LocalTime closingTime;      // latest time of possible arrivals of patients
-                                        // hereafter, nurses will continue work until the queue is empty
+    // hereafter, nurses will continue work until the queue is empty
 
     // simulation statistics for reporting
     private int maxQueueLength;             // the maximum queue length of waiting patients at any time today
@@ -31,8 +31,9 @@ public class CoronaTestLane {
 
     /**
      * Instantiates a corona test line for a given day of work
-     * @param openingTime       start time of sampling at the test lane today
-     * @param closingTime       latest time of possible arrivals of patients
+     *
+     * @param openingTime start time of sampling at the test lane today
+     * @param closingTime latest time of possible arrivals of patients
      */
     public CoronaTestLane(LocalTime openingTime, LocalTime closingTime) {
         this.openingTime = openingTime;
@@ -44,27 +45,28 @@ public class CoronaTestLane {
 
     /**
      * Simulate a day at the Test Lane
-     * @param numNurses         the number of nurses that shall be scheduled to work in parallel
-     * @param numPatients       the number of patient profiles that shall be generated to visit the Test Lane today
-     * @param priorityFraction  the fraction of patients that shall be given priority
-     *                          and will be allowed to skip non-priority patients on the waiting queue
-     * @param seed              used to initialize a randomizer to generate reproducible semi-random data
+     *
+     * @param numNurses        the number of nurses that shall be scheduled to work in parallel
+     * @param numPatients      the number of patient profiles that shall be generated to visit the Test Lane today
+     * @param priorityFraction the fraction of patients that shall be given priority
+     *                         and will be allowed to skip non-priority patients on the waiting queue
+     * @param seed             used to initialize a randomizer to generate reproducible semi-random data
      */
     public void configure(int numNurses, int numPatients, double priorityFraction, long seed) {
         randomizer = new Random(seed);
         System.out.printf("Configuring test lane with %d nurse(s) and %d patients (%.0f%% priority); seed=%d.%n",
-                numNurses, numPatients, 100*priorityFraction, seed);
+                numNurses, numPatients, 100 * priorityFraction, seed);
 
         // Configure the nurses
         nurses = new ArrayList<>();
         for (int n = 0; n < numNurses; n++) {
-            nurses.add( new Nurse("Nurse-" + (n+1), openingTime, randomizer));
+            nurses.add(new Nurse("Nurse-" + (n + 1), openingTime, randomizer));
         }
 
         // Generate the full list of patients that will be arriving at the test lane (and show a few)
         patients = new ArrayList<>();
         for (int p = 0; p < numPatients; p++) {
-            patients.add( new Patient(openingTime, closingTime, priorityFraction, randomizer) );
+            patients.add(new Patient(openingTime, closingTime, priorityFraction, randomizer));
         }
 
         // echo some patients for runtime confirmation
@@ -85,6 +87,7 @@ public class CoronaTestLane {
 
         // maintain the patients queue by priority and arrival time
         // This priority queue needs a proper way of determining the priority for the patients
+        // prioritizes on the available time of the nurse, first available is first in queue
         Queue<Patient> waitingPatients = new PriorityQueue<>(this.prioComparator);
 
         // reset availability of the nurses
@@ -94,7 +97,7 @@ public class CoronaTestLane {
             nurse.setTotalSamplingTime(0);
         }
 
-        // resetting statistics data
+        // resetting statistics data for every test run (added by Ronny)
         this.totalRegularPatients = 0;
         this.totalPriorityPatients = 0;
         this.totalRegularWaitTime = 0.0;
@@ -108,7 +111,7 @@ public class CoronaTestLane {
         availableNurses.addAll(nurses);
 
         // ensure patients are processed in order of arrival
-        // Ensure that the patients are ordered by arrival time
+        // Ensure that the patients are ordered by arrival time (added by Ronny)
         this.patients.sort(this.timeComparator);
 
         // track the max queueing as part of the simulation
@@ -118,7 +121,7 @@ public class CoronaTestLane {
         Nurse nextAvailableNurse = availableNurses.poll();
 
         // process all patients in order of arrival at the Test Lane
-        for (Patient patient: patients) {
+        for (Patient patient : patients) {
             // let nurses handle patients on the queue, if any
             // until the time of the next available nurse is later than the patient who just arrived
             while (!waitingPatients.isEmpty() && nextAvailableNurse.getAvailableAt().compareTo(patient.getArrivedAt()) <= 0) {
@@ -145,8 +148,6 @@ public class CoronaTestLane {
             maxQueueLength = Integer.max(maxQueueLength, waitingPatients.size());
 
 
-
-
         }
 
         // process the remaining patients on the queue, same as above
@@ -167,34 +168,38 @@ public class CoronaTestLane {
         //  i.e. time the work was finished
         //       average and maximum waiting times
 
-        // set new available time same for all nurses
-        for (Nurse nurse: this.nurses){
+        // set new available time same for all nurses (added by Ronny)
+        for (Nurse nurse : this.nurses) {
             nurse.setAvailableAt(nextAvailableNurse.getAvailableAt());
         }
 
-        // set end time lane
+        // set end time of te testing late (added by Ronny)
         this.workFinished = nextAvailableNurse.getAvailableAt();
 
-        // Loop through all patients to get the maximum waiting time for both prio patients and non prio patients
-
-        for (Patient patient: this.patients){
-
-            if (patient.isHasPriority()){
+        // Loop through all patients to get the maximum waiting time for both prio patients and non prio patients (added by Ronny)
+        for (Patient patient : this.patients) {
+            // for prio patients
+            if (patient.isHasPriority()) {
+                // for calculating stats
                 this.totalPriorityWaitTime += patient.totalWaitTimeSeconds();
                 this.totalPriorityPatients++;
+                // Get longest waiting prio patient
                 if (patient.totalWaitTimeSeconds() > this.maxPriorityWaitTime) {
                     this.maxPriorityWaitTime = (int) patient.totalWaitTimeSeconds();
                 }
             }
-            else if (!patient.isHasPriority()){
+            // for reg patients
+            else if (!patient.isHasPriority()) {
+                // for calculating stats
                 this.totalRegularWaitTime += patient.totalWaitTimeSeconds();
                 this.totalRegularPatients++;
+                // Get longest waiting reg patient
                 if (patient.totalWaitTimeSeconds() > this.maxRegularWaitTime) {
                     this.maxRegularWaitTime = (int) patient.totalWaitTimeSeconds();
                 }
             }
         }
-
+        // calculate average waiting time for prio and reg patient.
         this.averageRegularWaitTime = this.totalRegularWaitTime / this.totalRegularPatients;
         this.averagePriorityWaitTime = this.totalPriorityWaitTime / this.totalPriorityPatients;
 
@@ -211,10 +216,12 @@ public class CoronaTestLane {
         //  numPatients,
         //  average sample time for taking the nose sample,
         //  and percentage of opening hours of the Test Lane actually spent on taking samples
-        for (Nurse nurse: nurses) {
+        for (Nurse nurse : nurses) {
+            // the total time the lane is open
             double timeOpen = this.closingTime.toSecondOfDay() - this.openingTime.toSecondOfDay();
+            // calculate the workload for total time open
             double workLoad = (nurse.getTotalSamplingTime() / timeOpen) * 100;
-            System.out.println(nurse.toString() + String.format("%.0f", workLoad) + "%" );
+            System.out.println(nurse.toString() + String.format("%.0f", workLoad) + "%");
         }
 
 
@@ -226,7 +233,8 @@ public class CoronaTestLane {
         // report average and maximum wait times for regular and priority patients (if any)
         System.out.printf("Wait times:        Average:  Maximum:%n");
         System.out.printf("Regular patients:      %.2f        %d%n", this.averageRegularWaitTime, this.maxRegularWaitTime);
-        if (this.totalPriorityPatients > 0){
+        // if there are any prio patients print their stats
+        if (this.totalPriorityPatients > 0) {
             System.out.printf("Priority patients:      %.2f        %d%n", this.averagePriorityWaitTime, this.maxPriorityWaitTime);
         }
 
@@ -254,28 +262,29 @@ public class CoronaTestLane {
 
     /**
      * Calculate the number of patients per zip-area code (i.e. the digits of a zipcode)
-     * @return  a map of patient counts per zip-area code
+     *
+     * @return a map of patient counts per zip-area code
      */
     public Map<String, Integer> patientsByZipArea() {
-
         // create, populate and return the result map
         // create treemap, in test it is in order...
         Map<String, Integer> patientsByZip = new TreeMap<>();
 
-        for (Patient patient : patients){
-            String code = patient.getZipCode().substring(0,4);
-            // check if the code is already in the map
+        // loop through all patients to add 1 to the zip area
+        for (Patient patient : patients) {
+            // we only want the numbers so first 4 chars of string
+            String code = patient.getZipCode().substring(0, 4);
+            // check if the code (key) is already in the map
             patientsByZip.computeIfPresent(code, (key, value) -> value += 1);
-            // if code is absent insert into map
+            // if code (key) is absent insert into map
             patientsByZip.putIfAbsent(code, 1);
 
         }
-
+        // return the filled map
         return patientsByZip;
     }
 
     /**
-     *
      * @param patientsByZipArea map of amount of patient per zip area
      * @return a map with symptom and wich zip area has the highest percentage of that symptom
      */
@@ -284,38 +293,47 @@ public class CoronaTestLane {
         // create tree map, so we get it in order
         Map<Patient.Symptom, String> highestPatientBySymptom = new TreeMap<>();
 
-        for (Patient.Symptom symptom : Patient.Symptom.values()){
+        // to get highest % zip area for all symptoms we loop through all symptoms
+        for (Patient.Symptom symptom : Patient.Symptom.values()) {
+            // keep track of the highest percentage and the zip area that has the highest %
             double zipHighestPercentage = 0;
             String zipHighest = "";
-            // for each zip code
-            for (String key : patientsByZipArea.keySet()){
-                // chek if patient is from zip area
+            // We loop through all zip areas in "ByZip" map to check for each zip area what the % is for the symptom
+            for (String key : patientsByZipArea.keySet()) {
+                // keep track of the patients that have the symptom
                 double countOfSymptom = 0;
-                for (Patient patient : patients){
-                    if (key.equals(patient.getZipCode().substring(0,4))){
-                        // check wich symptoms the patient has
+                // loop through all patients to check wich patient has the symptom
+                for (Patient patient : patients) {
+                    // only check for current zip area
+                    if (key.equals(patient.getZipCode().substring(0, 4))) {
+                        // check if the patient has this symptom
                         boolean hasSymptom = patient.getSymptoms()[symptom.ordinal()];
-                        if (hasSymptom){
+                        // if patient has the symptom we update the counter
+                        if (hasSymptom) {
                             countOfSymptom += 1;
                         }
                     }
                 }
-
+                // We calculate the percentage of patients who have the symptom in the zip area
                 double percentageAmount = (countOfSymptom / patientsByZipArea.get(key)) * 100;
-
-                if (percentageAmount > zipHighestPercentage){
+                // If this zip area had a higher percentage we update the old % and zip area
+                if (percentageAmount > zipHighestPercentage) {
                     zipHighestPercentage = percentageAmount;
                     zipHighest = key;
                 }
 
 
             }
+            // create a string to add with the symptom key
             String codeWithAmount = String.format(" %s %.0f%%", zipHighest, zipHighestPercentage);
+            // add the symptom as key with the string value of zip code with highest % of the symptom
             highestPatientBySymptom.put(symptom, codeWithAmount);
         }
 
         return highestPatientBySymptom;
     }
+
+    // Getters and Setters
 
     public List<Patient> getPatients() {
         return patients;

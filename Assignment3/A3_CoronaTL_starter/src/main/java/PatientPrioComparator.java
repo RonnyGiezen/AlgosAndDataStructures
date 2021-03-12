@@ -1,5 +1,8 @@
 import java.util.Comparator;
 
+/**
+ * comparator class to compare patient on prio (added by Ronny)
+ */
 public class PatientPrioComparator implements Comparator<Patient> {
 
     @Override

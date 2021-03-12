@@ -1,5 +1,8 @@
 import java.util.Comparator;
 
+/**
+ * Comparator class to compare the patient on the time of arrival (added by Ronny)
+ */
 public class PatientTimeComparator implements Comparator<Patient> {
 
     @Override
