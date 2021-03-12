@@ -276,15 +276,43 @@ public class CoronaTestLane {
     /**
      *
      * @param patientsByZipArea map of amount of patient per zip area
-     * @return a map with highest percentage by symptom
+     * @return a map with symptom and wich zip area has the highest percentage of that symptom
      */
     public Map<Patient.Symptom, String> zipAreasWithHighestPatientPercentageBySymptom(Map<String, Integer> patientsByZipArea) {
+        // create, populate and return the result map
+        Map<Patient.Symptom, String> highestPatientBySympton = new TreeMap<>();
 
-        // TODO create, populate and return the result map
+        for (Patient.Symptom symptom : Patient.Symptom.values()){
+            double zipHighestPercentage = 0;
+            String zipHighest = "";
+            // for each zip code
+            for (String key : patientsByZipArea.keySet()){
+                // chek if patient is from zip area
+                double countOfSymptom = 0;
+                for (Patient patient : patients){
+                    if (key.equals(patient.getZipCode().substring(0,4))){
+                        // check wich symptoms the patient has
+                        boolean hasSymptom = patient.getSymptoms()[symptom.ordinal()];
+                        if (hasSymptom){
+                            countOfSymptom += 1;
+                        }
+                    }
+                }
+
+                double percentageAmount = (countOfSymptom / patientsByZipArea.get(key)) * 100;
+
+                if (percentageAmount > zipHighestPercentage){
+                    zipHighestPercentage = percentageAmount;
+                    zipHighest = key;
+                }
 
 
+            }
+            String codeWithAmount = String.format(" %s %.0f%%", zipHighest, zipHighestPercentage);
+            highestPatientBySympton.put(symptom, codeWithAmount);
+        }
 
-        return null;
+        return highestPatientBySympton;
     }
 
     public List<Patient> getPatients() {
