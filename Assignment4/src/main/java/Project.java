@@ -74,6 +74,35 @@ public class Project implements Comparable<Project> {
     //  every project shall have a unique code
 
     /**
+     * Added by Ronny
+     *
+     * @param o object to check equality with
+     * @return true if both projects are equal, false if they are not
+     */
+    @Override
+    public boolean equals(Object o) {
+        // if its not an instance of Project we cant compare it
+        if (!(o instanceof Project)){
+            return false;
+        }
+        // cast to Employee
+        Project pro = (Project) o;
+        // check if title is not null and see if both titles (are correlated to code) are equal
+        assert title != null;
+        return title.equals(pro.title);
+    }
+
+    /**
+     * added by Ronny
+     *
+     * @return return the hashcode of the title, so that's the same as the hashcode as copy object from tests
+     */
+    @Override
+    public int hashCode() {
+        return title == null ? 0 : title.hashCode();
+    }
+
+    /**
      * add the specified hoursPerDay commitment for the specified employee on the project
      * these hours should be added to any existing commitment of the employee on the project
      * there is no check on maximum allocation of hours per day;
