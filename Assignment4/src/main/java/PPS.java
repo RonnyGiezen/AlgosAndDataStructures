@@ -36,7 +36,7 @@ public class PPS {
      * Reports the statistics of the project planning year
      */
     public void printPlanningStatistics() {
-        System.out.printf("\nProject Statistics of '%s' in the year %d\n", name, planningYear);
+        System.out.printf("%nProject Statistics of '%s' in the year %d%n", name, planningYear);
         if (employees == null || projects == null || employees.size() == 0 || projects.size() == 0) {
             System.out.println("No employees or projects have been set up...");
             return;

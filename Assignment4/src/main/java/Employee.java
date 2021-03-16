@@ -47,7 +47,7 @@ public class Employee implements Comparable<Employee> {
         return number - o.number;
     }
 
-    // TODO make sure Employees can be printed. The format is 'name(number)'
+
 
     // TODO make sure Employees can be added to a HashMap, HashSet
     //  every employee shall have a unique number
@@ -157,5 +157,12 @@ public class Employee implements Comparable<Employee> {
         if (assignedProjects.removeIf(p -> p.equals(project))) {
             assignedProjects.add(project);
         }
+    }
+
+
+    // make sure Employees can be printed. The format is 'name(number)'
+    @Override
+    public String toString() {
+        return name + "(" + number + ")";
     }
 }
