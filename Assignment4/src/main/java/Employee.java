@@ -52,6 +52,24 @@ public class Employee implements Comparable<Employee> {
     // TODO make sure Employees can be added to a HashMap, HashSet
     //  every employee shall have a unique number
 
+
+    @Override
+    public boolean equals(Object o) {
+        if (!(o instanceof Employee)){
+            return false;
+        }
+
+        Employee emp = (Employee) o;
+        if (name == null && emp.name == null) return true;
+        assert name != null;
+        return name.equals(emp.name);
+    }
+
+    @Override
+    public int hashCode() {
+        return name == null ? 0 : name.hashCode();
+    }
+
     /**
      * Calculates the total budget of all committed manpower
      * across all projects that this employee is managing
