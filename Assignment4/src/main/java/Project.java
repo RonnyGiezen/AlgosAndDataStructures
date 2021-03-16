@@ -269,4 +269,9 @@ public class Project implements Comparable<Project> {
         }
         return null;
     }
+
+    @Override
+    public String toString() {
+        return title + "(" + code + ")";
+    }
 }
