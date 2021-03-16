@@ -49,22 +49,33 @@ public class Employee implements Comparable<Employee> {
 
 
 
-    // TODO make sure Employees can be added to a HashMap, HashSet
+    //  make sure Employees can be added to a HashMap, HashSet
     //  every employee shall have a unique number
 
-
+    /**
+     * Added by Ronny
+     *
+     * @param o object to check equality with
+     * @return true if both employees are equal, false if they are not
+     */
     @Override
     public boolean equals(Object o) {
+        // if its not an instance of Employee we cant compare it
         if (!(o instanceof Employee)){
             return false;
         }
-
+        // cast to Employee
         Employee emp = (Employee) o;
-        if (name == null && emp.name == null) return true;
+        // check if name is not null and see if both names (are correlated to number) are equal
         assert name != null;
         return name.equals(emp.name);
     }
 
+    /**
+     * added by Ronny
+     *
+     * @return return the hashcode of the name, so that's the same as the hashcode as copy object from tests
+     */
     @Override
     public int hashCode() {
         return name == null ? 0 : name.hashCode();
