@@ -88,8 +88,10 @@ public class Employee implements Comparable<Employee> {
      * @return
      */
     public int calculateManagedBudget() {
-        // TODO
-        return 0;
+       // TODO not sure if it works yet...
+        return managedProjects.stream()
+                .mapToInt(Project::calculateManpowerBudget)
+                .sum();
     }
 
     public int getNumber() {

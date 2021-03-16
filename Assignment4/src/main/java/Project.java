@@ -68,11 +68,9 @@ public class Project implements Comparable<Project> {
         return Calendar.getWorkingDays(this.startDate, this.endDate);
     }
 
-    // TODO make sure Projects can be printed. The format is 'title(code)'
 
-    // TODO make sure Projects can be added to a HashMap, HashSet
+    // make sure Projects can be added to a HashMap, HashSet
     //  every project shall have a unique code
-
     /**
      * Added by Ronny
      *
@@ -85,7 +83,7 @@ public class Project implements Comparable<Project> {
         if (!(o instanceof Project)){
             return false;
         }
-        // cast to Employee
+        // cast to Project
         Project pro = (Project) o;
         // check if title is not null and see if both titles (are correlated to code) are equal
         assert title != null;
@@ -270,6 +268,7 @@ public class Project implements Comparable<Project> {
         return null;
     }
 
+    // make sure Projects can be printed. The format is 'title(code)'
     @Override
     public String toString() {
         return title + "(" + code + ")";
