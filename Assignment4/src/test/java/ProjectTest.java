@@ -37,9 +37,24 @@ class ProjectTest {
     }
 
     @Test
+    void addCommitment() {
+        // check if employees are added to the map
+        assertEquals(2, project1.getCommittedHoursPerDay().size());
+        // check if value is correct
+        assertEquals(4, project1.getCommittedHoursPerDay().get(employee2));
+        // check if hours per day is updated correctly
+        project1.addCommitment(employee1, 3);
+        assertEquals(6, project1.getCommittedHoursPerDay().get(employee1));
+        // check if project is assigned in employee
+        assertTrue(employee1.getAssignedProjects().contains(project1));
+    }
+
+    @Test
     void checkBudgets() {
         assertEquals((3*20+4*30)*project1.getNumWorkingDays(), project1.calculateManpowerBudget(),"manpower budget project1");
         assertEquals((1*20+8*40)*project2.getNumWorkingDays(), project2.calculateManpowerBudget(),"manpower budget project2");
         assertEquals(0, project3.calculateManpowerBudget(),"manpower budget project3");
     }
+
+
 }

@@ -14,7 +14,7 @@ public class Project implements Comparable<Project> {
     private Map<Employee,Integer> committedHoursPerDay;
                                         // daily committed work hours on the project by employee
                                         // one employee may work on multiple different projects each day
-                                        // employees will no overtime if more than 8 hours per day are committed
+                                        // employees will do overtime if more than 8 hours per day are committed
 
     public Project(String projectCode) {
         this.code = projectCode;
@@ -104,14 +104,14 @@ public class Project implements Comparable<Project> {
      * add the specified hoursPerDay commitment for the specified employee on the project
      * these hours should be added to any existing commitment of the employee on the project
      * there is no check on maximum allocation of hours per day;
-     * if the total exceeds 8 per day on any day, the exployee will be expected to do overtime
-     * @param employee
-     * @param hoursPerDay
+     * if the total exceeds 8 per day on any day, the employee will be expected to do overtime
+     * @param employee the employee that is updated or added in the project
+     * @param hoursPerDay the hours per day the employee is working on the project
      */
     public void addCommitment(Employee employee, int hoursPerDay) {
         // TODO
-
-
+        committedHoursPerDay.computeIfPresent(employee, (key, value) -> value += hoursPerDay);
+        committedHoursPerDay.putIfAbsent(employee, hoursPerDay);
         // also register this project assignment for this employee,
         // in case that had not been done before
         employee.getAssignedProjects().add(this);
