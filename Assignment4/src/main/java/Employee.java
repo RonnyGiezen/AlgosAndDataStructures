@@ -85,7 +85,7 @@ public class Employee implements Comparable<Employee> {
      * Calculates the total budget of all committed manpower
      * across all projects that this employee is managing
      * this is a.k.a. the total budget responsibility of the employee
-     * @return
+     * @return the total value of the budget of managed projects
      */
     public int calculateManagedBudget() {
        // TODO not sure if it works yet...

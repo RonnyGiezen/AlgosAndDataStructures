@@ -109,8 +109,9 @@ public class Project implements Comparable<Project> {
      * @param hoursPerDay the hours per day the employee is working on the project
      */
     public void addCommitment(Employee employee, int hoursPerDay) {
-        // TODO
+        // update the hoursPerDay if employee/key if present
         committedHoursPerDay.computeIfPresent(employee, (key, value) -> value += hoursPerDay);
+        // if employee is absent put new key and value
         committedHoursPerDay.putIfAbsent(employee, hoursPerDay);
         // also register this project assignment for this employee,
         // in case that had not been done before
@@ -121,11 +122,16 @@ public class Project implements Comparable<Project> {
      * Calculate total manpower budget for the project
      * from the committed hours per employee per working day
      * and the hourlyRate per employee
-     * @return
+     * @return count of committed hours time the hourly rate for each employee on the project
      */
     public int calculateManpowerBudget() {
-        // TODO
-        return 0;
+        // calculate budget for each employee per day
+        int budget = committedHoursPerDay.entrySet()
+                .stream()
+                .mapToInt(e -> e.getKey().getHourlyWage() * e.getValue())
+                .sum();
+
+        return budget * getNumWorkingDays();
     }
 
     public String getCode() {
