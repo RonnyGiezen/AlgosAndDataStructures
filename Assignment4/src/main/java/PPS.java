@@ -5,6 +5,7 @@ import javax.xml.stream.XMLStreamConstants;
 import java.time.Month;
 import java.util.*;
 import java.util.function.Predicate;
+import java.util.stream.Collectors;
 
 public class PPS {
 
@@ -55,10 +56,8 @@ public class PPS {
      */
     public double calculateAverageHourlyWage() {
         // count all average wages of all employees
-        double avWage = this.employees.stream()
-                .mapToInt(Employee::getHourlyWage)
-                .sum();
-        return avWage / employees.size();
+        return this.employees.stream()
+                .collect(Collectors.averagingDouble(Employee::getHourlyWage));
     }
 
     /**
@@ -94,8 +93,16 @@ public class PPS {
      * @return
      */
     public Set<Employee> calculateMostInvolvedEmployees() {
-        // TODO
-        return null;
+        // First we find the any employee with the longest size of assigned projects (most involved)
+        int longest = employees.stream()
+                .mapToInt(e -> e.getAssignedProjects().size())
+                .max()
+                .orElse(0);
+        // then we just filter the set of employees on wich employees also have the longest size
+        // and we collect it to a new set
+        return employees.stream()
+                .filter(e -> e.getAssignedProjects().size() == longest)
+                .collect(Collectors.toSet());
     }
 
     /**
