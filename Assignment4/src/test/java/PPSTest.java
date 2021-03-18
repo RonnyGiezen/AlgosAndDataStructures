@@ -30,10 +30,6 @@ class PPSTest {
                         .addCommitment("P2002", 88808, 3)
                         .addCommitment("P2002", 88808, 1)
                     .build();
-        System.out.println(pps.getEmployees());
-        System.out.println(employee1.getManagedProjects());
-        System.out.println(project1);
-        System.out.println(project2);
     }
 
     @Test

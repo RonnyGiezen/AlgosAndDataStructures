@@ -147,7 +147,7 @@ public class PPS {
          * @return
          */
         public Builder addEmployee(Employee employee) {
-            // TODO check if this is all
+            // add employee to the set
             this.pps.employees.add(employee);
             return this;
         }
@@ -189,18 +189,19 @@ public class PPS {
          * @return
          */
         public Builder addCommitment(String projectCode, int employeeNr, int hoursPerDay) {
-            // TODO check if it works
+            // get project on project code
             Project project = this.pps.projects.stream()
                     .filter(p -> p.getCode().equals(projectCode))
                     .findAny()
                     .orElse(null);
-
+            // get employee on number, if not exists we create a new one
             Employee employee = this.pps.employees.stream()
                     .filter(e -> e.getNumber() == employeeNr)
                     .findAny()
-                    .orElse(null);
-
+                    .orElse(new Employee(employeeNr, hoursPerDay));
+            // assert not null to make sonarlint happy
             assert project != null;
+            // add commitment to the project with the employee found or created
             project.addCommitment(employee, hoursPerDay);
 
             return this;
