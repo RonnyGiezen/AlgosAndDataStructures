@@ -54,8 +54,11 @@ public class PPS {
      * @return
      */
     public double calculateAverageHourlyWage() {
-        // TODO
-        return 0.0;
+        // count all average wages of all employees
+        double avWage = this.employees.stream()
+                .mapToInt(Employee::getHourlyWage)
+                .sum();
+        return avWage / employees.size();
     }
 
     /**
@@ -144,19 +147,34 @@ public class PPS {
          * @return
          */
         public Builder addEmployee(Employee employee) {
-            // TODO
+            // TODO check if this is all
+            this.pps.employees.add(employee);
             return this;
         }
 
         /**
          * Add another project to the PPS
          * register the specified manager as the manager of the new
-         * @param project
-         * @param manager
-         * @return
+         * @param project project to add
+         * @param manager manager of the project
+         * @return the builder
          */
         public Builder addProject(Project project, Employee manager) {
-            // TODO
+            // first we add new project
+            this.pps.projects.add(project);
+            // then we update the employees list with the manager because a manager is also a employee
+            // but only if the manager does not exist yet
+            if (!this.pps.employees.contains(manager)){
+                this.addEmployee(manager);
+            }
+            // then we set and find the manager in the set, otherwise we get lost objects
+            Employee man = this.pps.employees.stream()
+                    .filter(m -> m.getNumber() == manager.getNumber())
+                    .findAny().orElse(null);
+            // assert not null to make sonarlint happy
+            assert man != null;
+            // add the project to the manager as well
+            man.getManagedProjects().add(project);
             return this;
         }
 
@@ -171,7 +189,20 @@ public class PPS {
          * @return
          */
         public Builder addCommitment(String projectCode, int employeeNr, int hoursPerDay) {
-            // TODO
+            // TODO check if it works
+            Project project = this.pps.projects.stream()
+                    .filter(p -> p.getCode().equals(projectCode))
+                    .findAny()
+                    .orElse(null);
+
+            Employee employee = this.pps.employees.stream()
+                    .filter(e -> e.getNumber() == employeeNr)
+                    .findAny()
+                    .orElse(null);
+
+            assert project != null;
+            project.addCommitment(employee, hoursPerDay);
+
             return this;
         }
 

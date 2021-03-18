@@ -66,19 +66,18 @@ public class Employee implements Comparable<Employee> {
         }
         // cast to Employee
         Employee emp = (Employee) o;
-        // check if name is not null and see if both names (are correlated to number) are equal
-        assert name != null;
-        return name.equals(emp.name);
+        // check number en object (employee) number (UI) are equal
+        return number == emp.number;
     }
 
     /**
      * added by Ronny
      *
-     * @return return the hashcode of the name, so that's the same as the hashcode as copy object from tests
+     * @return return the hashcode of the number, because that is the unique identifier
      */
     @Override
     public int hashCode() {
-        return name == null ? 0 : name.hashCode();
+        return Objects.hash(number);
     }
 
     /**
@@ -88,7 +87,7 @@ public class Employee implements Comparable<Employee> {
      * @return the total value of the budget of managed projects
      */
     public int calculateManagedBudget() {
-       // TODO not sure if it works yet...
+       // calculate managed budget
         return managedProjects.stream()
                 .mapToInt(Project::calculateManpowerBudget)
                 .sum();
