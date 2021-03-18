@@ -64,11 +64,13 @@ public class PPS {
     /**
      * finds the project with the highest number of available working days.
      * (if more than one project with the highest number is found, any one is returned)
-     * @return
+     * @return project with longest working days
      */
     public Project calculateLongestProject() {
-        // TODO
-        return null;
+        // Todo check if it works
+        return projects.stream()
+                .max(Comparator.comparing(Project::getNumWorkingDays))
+                .orElse(null);
     }
 
     /**
@@ -143,8 +145,8 @@ public class PPS {
 
         /**
          * Add another employee to the PPS being build
-         * @param employee
-         * @return
+         * @param employee employee to add
+         * @return this builder
          */
         public Builder addEmployee(Employee employee) {
             // add employee to the set
