@@ -67,7 +67,7 @@ public class PPS {
      * @return project with longest working days
      */
     public Project calculateLongestProject() {
-        // Todo check if it works
+        // calculate longest project
         return projects.stream()
                 .max(Comparator.comparing(Project::getNumWorkingDays))
                 .orElse(null);
@@ -81,8 +81,10 @@ public class PPS {
      * @return
      */
     public int calculateTotalManpowerBudget() {
-        // TODO
-        return 0;
+        // calculate total budget of all projects
+        return projects.stream()
+                .mapToInt(Project::calculateManpowerBudget)
+                .sum();
     }
 
     /**

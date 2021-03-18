@@ -3,7 +3,7 @@ import org.junit.jupiter.api.Test;
 
 import java.time.LocalDate;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.*;
 
 class PPSTest {
     Project project1, project2, project3;
@@ -33,18 +33,29 @@ class PPSTest {
     }
 
     @Test
-    void calculateAverageHourlyWageTest() {
-        // average wage = 25 (only added
-        assertEquals(25, pps.calculateAverageHourlyWage());
-    }
-
-    @Test
     void checkPPSBuilder() {
         assertEquals(3, pps.getEmployees().size(), pps.getEmployees().toString());
         assertEquals(3, pps.getProjects().size(), pps.getProjects().toString());
         assertEquals((4*20+3*25+2*30)*project1.getNumWorkingDays(), project1.calculateManpowerBudget());
         assertEquals((4*30)*project2.getNumWorkingDays(), project2.calculateManpowerBudget());
         assertEquals(project1.calculateManpowerBudget()+project2.calculateManpowerBudget(), employee1.calculateManagedBudget(),"managed budget employee1");
+    }
+
+    @Test
+    void calculateAverageHourlyWage() {
+        assertEquals(25, pps.calculateAverageHourlyWage());
+    }
+
+    @Test
+    void calculateLongestProject() {
+        assertEquals(project1, pps.calculateLongestProject());
+        assertNotEquals(pps.calculateLongestProject(), project2);
+    }
+
+    @Test
+    void calculateTotalManpowerBudget() {
+        int totalTestBudget = ((4*20+3*25+2*30)*project1.getNumWorkingDays()) + ((4*30)*project2.getNumWorkingDays());
+        assertEquals(totalTestBudget, pps.calculateTotalManpowerBudget());
     }
 
     @Test
@@ -79,4 +90,5 @@ class PPSTest {
         assertEquals("Floor insulation - BPH-05(P100575)", pps.calculateLongestProject().toString(),"longest project");
         assertEquals(159441, pps.calculateTotalManpowerBudget(),"total manpower budget");
     }
+
 }
