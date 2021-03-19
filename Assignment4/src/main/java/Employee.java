@@ -14,16 +14,16 @@ public class Employee implements Comparable<Employee> {
     private int number;                     // unique identifier of an Employee
     private String name;
     private int hourlyWage;                 // hourly charge rate of an Employee
-                                            // used to calculate cost of project manpower
+    // used to calculate cost of project manpower
     private Set<Project> managedProjects;   // the projects that are managed by this employee
     private Set<Project> assignedProjects;  // the projects that this employee is working on
-                                            // (the project manager is also assigned to his/her project)
+    // (the project manager is also assigned to his/her project)
 
     public Employee(int number) {
         this.number = number;
         name = Names.nextFullNameWithMI(number);
         lastNumber = Math.max(number, lastNumber);
-        hourlyWage = 16 + randomizer.nextInt(MAX_WAGE -15);
+        hourlyWage = 16 + randomizer.nextInt(MAX_WAGE - 15);
         managedProjects = new HashSet<>();
         assignedProjects = new HashSet<>();
     }
@@ -48,7 +48,6 @@ public class Employee implements Comparable<Employee> {
     }
 
 
-
     //  make sure Employees can be added to a HashMap, HashSet
     //  every employee shall have a unique number
 
@@ -60,13 +59,13 @@ public class Employee implements Comparable<Employee> {
      */
     @Override
     public boolean equals(Object o) {
-        // if its not an instance of Employee we cant compare it
-        if (!(o instanceof Employee)){
+        // if its not an instance of Employee we cant compare it and we are sure it is not equal
+        if (!(o instanceof Employee)) {
             return false;
         }
         // cast to Employee
         Employee emp = (Employee) o;
-        // check number en object (employee) number (UI) are equal
+        // check number and object (employee) number (Unique Identifier) are equal
         return number == emp.number;
     }
 
@@ -84,10 +83,11 @@ public class Employee implements Comparable<Employee> {
      * Calculates the total budget of all committed manpower
      * across all projects that this employee is managing
      * this is a.k.a. the total budget responsibility of the employee
+     *
      * @return the total value of the budget of managed projects
      */
     public int calculateManagedBudget() {
-       // calculate managed budget by adding all the outcome of calculatemanpowerbudget from project
+        // calculate managed budget by adding all the outcome of calculatemanpowerbudget from project
         return managedProjects.stream()
                 .mapToInt(Project::calculateManpowerBudget)
                 .sum();
@@ -118,7 +118,7 @@ public class Employee implements Comparable<Employee> {
     // and XML import and export
 
     public static Set<Employee> importEmployeesFromXML(XMLParser xmlParser, Set<Employee> employees,
-                    Set<Project> projects) throws XMLStreamException {
+                                                       Set<Project> projects) throws XMLStreamException {
         if (xmlParser.nextBeginTag("employees")) {
             xmlParser.nextTag();
             if (employees != null) {

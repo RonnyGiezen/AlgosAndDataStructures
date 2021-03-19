@@ -11,10 +11,10 @@ public class Project implements Comparable<Project> {
     private String title;
     private LocalDate startDate;        // the first working day of the project;
     private LocalDate endDate;          // the last working day of the project;
-    private Map<Employee,Integer> committedHoursPerDay;
-                                        // daily committed work hours on the project by employee
-                                        // one employee may work on multiple different projects each day
-                                        // employees will do overtime if more than 8 hours per day are committed
+    private Map<Employee, Integer> committedHoursPerDay;
+    // daily committed work hours on the project by employee
+    // one employee may work on multiple different projects each day
+    // employees will do overtime if more than 8 hours per day are committed
 
     public Project(String projectCode) {
         this.code = projectCode;
@@ -53,7 +53,8 @@ public class Project implements Comparable<Project> {
     /**
      * provides the number of available working days for the project,
      * excluding weekend days
-     * @return
+     *
+     * @return the number of working days between two dates
      */
     public int getNumWorkingDays() {
         return utils.Calendar.getNumWorkingDays(this.startDate, this.endDate);
@@ -62,7 +63,8 @@ public class Project implements Comparable<Project> {
     /**
      * provides a collection of dates that represent each of the available working days for the project,
      * excluding weekend days
-     * @return
+     *
+     * @return the working days between two days in a set
      */
     public Set<LocalDate> getWorkingDays() {
         return Calendar.getWorkingDays(this.startDate, this.endDate);
@@ -71,6 +73,7 @@ public class Project implements Comparable<Project> {
 
     // make sure Projects can be added to a HashMap, HashSet
     //  every project shall have a unique code
+
     /**
      * Added by Ronny
      *
@@ -80,24 +83,24 @@ public class Project implements Comparable<Project> {
     @Override
     public boolean equals(Object o) {
         // if its not an instance of Project we cant compare it
-        if (!(o instanceof Project)){
+        if (!(o instanceof Project)) {
             return false;
         }
         // cast to Project
         Project pro = (Project) o;
-        // check if title is not null and see if both titles (are correlated to code) are equal
-        assert title != null;
-        return title.equals(pro.title);
+        // check if code is not null and see if both codes (UI) are equal
+        assert code != null;
+        return code.equals(pro.getCode());
     }
 
     /**
      * added by Ronny
      *
-     * @return return the hashcode of the title, so that's the same as the hashcode as copy object from tests
+     * @return return the hashcode of the code
      */
     @Override
     public int hashCode() {
-        return title == null ? 0 : title.hashCode();
+        return code == null ? 0 : code.hashCode();
     }
 
     /**
@@ -105,11 +108,12 @@ public class Project implements Comparable<Project> {
      * these hours should be added to any existing commitment of the employee on the project
      * there is no check on maximum allocation of hours per day;
      * if the total exceeds 8 per day on any day, the employee will be expected to do overtime
-     * @param employee the employee that is updated or added in the project
+     *
+     * @param employee    the employee that is updated or added in the project
      * @param hoursPerDay the hours per day the employee is working on the project
      */
     public void addCommitment(Employee employee, int hoursPerDay) {
-        // update the hoursPerDay if employee/key if present
+        // update the hoursPerDay if employee/key is present
         committedHoursPerDay.computeIfPresent(employee, (key, value) -> value += hoursPerDay);
         // if employee is absent put new key and value
         committedHoursPerDay.putIfAbsent(employee, hoursPerDay);
@@ -122,15 +126,17 @@ public class Project implements Comparable<Project> {
      * Calculate total manpower budget for the project
      * from the committed hours per employee per working day
      * and the hourlyRate per employee
+     *
      * @return count of committed hours time the hourly rate for each employee on the project
      */
     public int calculateManpowerBudget() {
         // calculate budget for each employee per day
+        // for each employee in hashmap we multiply the hours with wage
         int budget = committedHoursPerDay.entrySet()
                 .stream()
                 .mapToInt(e -> e.getKey().getHourlyWage() * e.getValue())
                 .sum();
-
+        // we need it for all working days in the project
         return budget * getNumWorkingDays();
     }
 
@@ -164,7 +170,7 @@ public class Project implements Comparable<Project> {
         projectNr /= N_FLOORS;
         int subjectIdx = projectNr % subjects.length;
         int locationIdx = (projectNr / subjects.length) % locations.length;
-        return  subjects[subjectIdx] + " - " + locations[locationIdx] + "-0" + floor;
+        return subjects[subjectIdx] + " - " + locations[locationIdx] + "-0" + floor;
     }
 
     private final static String[] subjects = {
@@ -176,7 +182,7 @@ public class Project implements Comparable<Project> {
             "Lighting replacements",
             "Funiture replacements",
             "Toilets refurbishment",
-            "Workspace rearrangement" };
+            "Workspace rearrangement"};
 
     private final static String[] locations = {
             "KSH",
@@ -187,7 +193,7 @@ public class Project implements Comparable<Project> {
             "TTH",
             "CON",
             "IWO",
-            "SCP" };
+            "SCP"};
 
     private static final int MAX_PROJECTS =
             N_FLOORS * subjects.length * locations.length;
@@ -197,7 +203,7 @@ public class Project implements Comparable<Project> {
         // replace the employee key of the commitment
         Integer hoursPerDay;
         if ((hoursPerDay = this.getCommittedHoursPerDay().remove(employee)) != null) {
-            this.getCommittedHoursPerDay().put(employee,hoursPerDay);
+            this.getCommittedHoursPerDay().put(employee, hoursPerDay);
         }
     }
 
@@ -261,6 +267,7 @@ public class Project implements Comparable<Project> {
         }
         return null;
     }
+
     public static Project importReferenceFromXML(XMLParser xmlParser, Set<Project> projects) throws XMLStreamException {
         if (xmlParser.nextBeginTag("project")) {
             String code = xmlParser.getAttributeValue(null, "code");

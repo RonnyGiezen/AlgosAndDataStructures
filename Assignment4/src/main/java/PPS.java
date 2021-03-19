@@ -53,21 +53,23 @@ public class PPS {
         // Print average hourly wage
         System.out.println("1. The average hourly wage of all employees is " + this.calculateAverageHourlyWage() + ".\n");
 
-        // print longest project
+        // print longest project with the amount of working days of that project
         System.out.printf("2. %s with %d available working days. %n", this.calculateLongestProject().toString(),
                 this.calculateLongestProject().getNumWorkingDays());
 
         // print hardest working employees
+        // we also want to know the amount of projects the employee(s) is in.
         int projectsAmount = this.calculateMostInvolvedEmployees().stream()
                 .mapToInt(e -> e.getAssignedProjects().size())
                 .sum();
         System.out.printf("3. The following employees have the broadest assignment in no less than %d different projects:%n %s %n",
                 projectsAmount, this.calculateMostInvolvedEmployees());
 
-        // print total budget
+        // print total budget of all projects
         System.out.printf("4. The total budget of committed project manpower is %d %n", this.calculateTotalManpowerBudget());
 
         // print managed budget by junior employees
+        // create predicate to get managed budget for only junior employees (as in example output assignment)
         Predicate<Employee> juniorEmps = e -> e.getHourlyWage() <= Employee.MAX_JUNIOR_WAGE;
         System.out.printf("5. Below is an overview of total managed budget by junior employees (hourly wage <= 26):%n%s%n",
                 this.calculateManagedBudgetOverview(juniorEmps));
@@ -75,8 +77,10 @@ public class PPS {
         // print employees working at least 8 hours
         System.out.printf("6. Below is an overview of employees working at least 8 hours per day:%n%s%n", this.getFulltimeEmployees());
 
-        // calculate monthly spends
+        // print the map of monthly spends
         System.out.println("7. Below is an overview of cumulative monthly project spends:\n" + this.calculateCumulativeMonthlySpends());
+        // pretty print for more than one test
+        System.out.println("\n-----------------------------------------------------------------------");
     }
 
     /**
@@ -86,6 +90,7 @@ public class PPS {
      */
     public double calculateAverageHourlyWage() {
         // count all average wages of all employees
+        // by collecting all employees from the set and using the Collectors method to calculate average
         return this.employees.stream()
                 .collect(Collectors.averagingDouble(Employee::getHourlyWage));
     }
@@ -97,7 +102,7 @@ public class PPS {
      * @return project with longest working days
      */
     public Project calculateLongestProject() {
-        // calculate longest project
+        // calculate longest project by comparing the projects on the amount of working days
         return projects.stream()
                 .max(Comparator.comparing(Project::getNumWorkingDays))
                 .orElse(null);
@@ -112,7 +117,7 @@ public class PPS {
      * @return the integer of the total man power budget
      */
     public int calculateTotalManpowerBudget() {
-        // calculate total budget of all projects
+        // calculate total budget of all projects by calculating the budget for each project and adding it all up
         return projects.stream()
                 .mapToInt(Project::calculateManpowerBudget)
                 .sum();
@@ -126,13 +131,13 @@ public class PPS {
      * @return a new set with employees whi are most involved
      */
     public Set<Employee> calculateMostInvolvedEmployees() {
-        // First we find the any employee with the longest size of assigned projects (most involved)
+        // First we find the employee with the longest size of assigned projects (most involved)
         int longest = employees.stream()
                 .mapToInt(e -> e.getAssignedProjects().size())
                 .max()
                 .orElse(0);
         // then we just filter the set of employees on wich employees also have the longest size
-        // and we collect it to a new set
+        // and we return the outcome in a new set
         return employees.stream()
                 .filter(e -> e.getAssignedProjects().size() == longest)
                 .collect(Collectors.toSet());
@@ -163,11 +168,11 @@ public class PPS {
         // create new tree map to get all months in order
         Map<Month, Integer> monthlySpends = new TreeMap<>();
 
-        for (Project p: this.projects) {
+        for (Project p : this.projects) {
             // set start of the loop to the start date of the project
             LocalDate current = p.getStartDate();
-            // while loop for the time period of the project, should end when end date of the project is reached
-            while (current.isBefore(p.getEndDate()) || current.isEqual(p.getEndDate())){
+            // while loop for the time period of the project, stops when last month (end date) is done
+            while (current.isBefore(p.getEndDate()) || current.isEqual(p.getEndDate())) {
                 // total working days for the "first" month of the project
                 int days = utils.Calendar.getNumWorkingDays(current, current.withDayOfMonth(current.lengthOfMonth()));
                 // loop over map of employees in Project to calculate total spend on all employees per day
@@ -182,7 +187,7 @@ public class PPS {
                 current = current.plusMonths(1);
             }
         }
-
+        // return the map
         return monthlySpends;
 
     }
@@ -193,7 +198,8 @@ public class PPS {
      * @return set of all employees who are working more than 7 hours a day
      */
     public Set<Employee> getFulltimeEmployees() {
-        // use flatmap to stream over committed hours map and filter the map values
+        // use flatmap to stream over committed hours map and filter the map values (hours per day of employee)
+        // we filter on everything above 7 (will always be 8 or higher because integer)
         // then collect them in a new set and return the set
         return projects.stream()
                 .flatMap(p -> p.getCommittedHoursPerDay().entrySet().stream())
@@ -261,10 +267,10 @@ public class PPS {
          * This commitment is added to any other commitment that the same employee already
          * has got registered on the same project,
          *
-         * @param projectCode
-         * @param employeeNr
-         * @param hoursPerDay
-         * @return
+         * @param projectCode the code of the project (UI)
+         * @param employeeNr  the number of the employee (UI)
+         * @param hoursPerDay the hours per day the employee is committing
+         * @return the builder
          */
         public Builder addCommitment(String projectCode, int employeeNr, int hoursPerDay) {
             // get project on project code
@@ -288,7 +294,7 @@ public class PPS {
         /**
          * Complete the PPS being build
          *
-         * @return
+         * @return the pps build
          */
         public PPS build() {
             return pps;
@@ -307,7 +313,7 @@ public class PPS {
      * Loads a complete configuration from an XML file
      *
      * @param resourceName the XML file name to be found in the resources folder
-     * @return
+     * @return pps
      */
     public static PPS importFromXML(String resourceName) {
         XMLParser xmlParser = new XMLParser(resourceName);
