@@ -2,6 +2,7 @@ import utils.SLF4J;
 import utils.XMLParser;
 
 import javax.xml.stream.XMLStreamConstants;
+import java.time.LocalDate;
 import java.time.Month;
 import java.util.*;
 import java.util.function.Function;
@@ -53,29 +54,35 @@ public class PPS {
         System.out.println("1. The average hourly wage of all employees is " + this.calculateAverageHourlyWage() + ".\n");
 
         // print longest project
-        System.out.printf("2. %s with %d available working days. %n", this.calculateLongestProject().toString(), this.calculateLongestProject().getNumWorkingDays());
+        System.out.printf("2. %s with %d available working days. %n", this.calculateLongestProject().toString(),
+                this.calculateLongestProject().getNumWorkingDays());
 
         // print hardest working employees
         int projectsAmount = this.calculateMostInvolvedEmployees().stream()
                 .mapToInt(e -> e.getAssignedProjects().size())
                 .sum();
-        System.out.printf("3. The following employees have the broadest assignment in no less than %d different projects:%n %s %n", projectsAmount, this.calculateMostInvolvedEmployees());
+        System.out.printf("3. The following employees have the broadest assignment in no less than %d different projects:%n %s %n",
+                projectsAmount, this.calculateMostInvolvedEmployees());
 
         // print total budget
         System.out.printf("4. The total budget of committed project manpower is %d %n", this.calculateTotalManpowerBudget());
 
         // print managed budget by junior employees
         Predicate<Employee> juniorEmps = e -> e.getHourlyWage() <= 26;
-        System.out.printf("5. Below is an overview of total managed budget by junior employees (hourly wage <= 26):%n%s%n", this.calculateManagedBudgetOverview(juniorEmps));
+        System.out.printf("5. Below is an overview of total managed budget by junior employees (hourly wage <= 26):%n%s%n",
+                this.calculateManagedBudgetOverview(juniorEmps));
 
         // print employees working at least 8 hours
         System.out.printf("6. Below is an overview of employees working at least 8 hours per day:%n%s%n", this.getFulltimeEmployees());
+
+        // calculate monthly spends
+        System.out.println("7. Below is an overview of cumulative monthly project spends:\n" + this.calculateCumulativeMonthlySpends());
     }
 
     /**
      * calculates the average hourly wage of all known employees in this system
      *
-     * @return
+     * @return the average hourly wage of all known employees
      */
     public double calculateAverageHourlyWage() {
         // count all average wages of all employees
@@ -155,8 +162,30 @@ public class PPS {
      * @return TODO write test
      */
     public Map<Month, Integer> calculateCumulativeMonthlySpends() {
-        // TODO
-        return null;
+        // create new tree map to get all months in order
+        Map<Month, Integer> monthlySpends = new TreeMap<>();
+
+        for (Project p: this.projects) {
+            // set start of the loop to the start date of the project
+            LocalDate current = p.getStartDate();
+            // while loop for the time period of the project, should end when end date of the project is reached
+            while (current.isBefore(p.getEndDate())){
+                // total working days for the "first" month of the project
+                int days = utils.Calendar.getNumWorkingDays(current, current.withDayOfMonth(current.lengthOfMonth()));
+                // loop over map of employees in Project to calculate total spend on all employees per day
+                int spends = p.getCommittedHoursPerDay().entrySet().stream()
+                        .mapToInt(e -> e.getKey().getHourlyWage() * e.getValue())
+                        .sum();
+                // add to map, if month already in map update the value
+                monthlySpends.computeIfPresent(current.getMonth(), (key, value) -> value += spends * days);
+                // otherwise set month in map and the spends for this project for the month
+                monthlySpends.putIfAbsent(current.getMonth(), spends * days);
+                // go to next month
+                current = current.plusMonths(1);
+            }
+        }
+
+        return monthlySpends;
 
     }
 
