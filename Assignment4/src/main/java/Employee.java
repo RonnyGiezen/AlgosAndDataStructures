@@ -87,7 +87,7 @@ public class Employee implements Comparable<Employee> {
      * @return the total value of the budget of managed projects
      */
     public int calculateManagedBudget() {
-       // calculate managed budget
+       // calculate managed budget by adding all the outcome of calculatemanpowerbudget from project
         return managedProjects.stream()
                 .mapToInt(Project::calculateManpowerBudget)
                 .sum();

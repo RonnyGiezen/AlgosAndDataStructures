@@ -68,7 +68,7 @@ public class PPS {
         System.out.printf("4. The total budget of committed project manpower is %d %n", this.calculateTotalManpowerBudget());
 
         // print managed budget by junior employees
-        Predicate<Employee> juniorEmps = e -> e.getHourlyWage() <= 26;
+        Predicate<Employee> juniorEmps = e -> e.getHourlyWage() <= Employee.MAX_JUNIOR_WAGE;
         System.out.printf("5. Below is an overview of total managed budget by junior employees (hourly wage <= 26):%n%s%n",
                 this.calculateManagedBudgetOverview(juniorEmps));
 
@@ -124,7 +124,6 @@ public class PPS {
      * all these employees are returned in the set)
      *
      * @return a new set with employees whi are most involved
-     * TODO write test
      */
     public Set<Employee> calculateMostInvolvedEmployees() {
         // First we find the any employee with the longest size of assigned projects (most involved)
@@ -144,8 +143,7 @@ public class PPS {
      * The total managed budget of an employee is the sum of all man power budgets of all projects
      * that are being managed by this employee
      *
-     * @param filter
-     * @return TODO write test
+     * @param filter predicate of employee type
      */
     public Map<Employee, Integer> calculateManagedBudgetOverview(Predicate<Employee> filter) {
         // first we filter the list then we add the employee to the map and the managed budget as value
@@ -159,7 +157,7 @@ public class PPS {
      * The monthly spend of a single project is the accumulated manpower cost of all employees assigned to the
      * project across all working days in the month.
      *
-     * @return TODO write test
+     * @return map od all months with spends for all projects
      */
     public Map<Month, Integer> calculateCumulativeMonthlySpends() {
         // create new tree map to get all months in order
@@ -169,7 +167,7 @@ public class PPS {
             // set start of the loop to the start date of the project
             LocalDate current = p.getStartDate();
             // while loop for the time period of the project, should end when end date of the project is reached
-            while (current.isBefore(p.getEndDate())){
+            while (current.isBefore(p.getEndDate()) || current.isEqual(p.getEndDate())){
                 // total working days for the "first" month of the project
                 int days = utils.Calendar.getNumWorkingDays(current, current.withDayOfMonth(current.lengthOfMonth()));
                 // loop over map of employees in Project to calculate total spend on all employees per day

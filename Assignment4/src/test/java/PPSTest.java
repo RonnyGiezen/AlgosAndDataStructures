@@ -1,7 +1,9 @@
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import utils.Calendar;
 
 import java.time.LocalDate;
+import java.time.Month;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -90,5 +92,24 @@ class PPSTest {
         assertEquals("Floor insulation - BPH-05(P100575)", pps.calculateLongestProject().toString(),"longest project");
         assertEquals(159441, pps.calculateTotalManpowerBudget(),"total manpower budget");
     }
+
+    @Test
+    void getFulltimeEmployees() {
+        Employee employee4 = new Employee(99808, 30);
+        Employee employee5 = new Employee(99999, 30);
+        project3.addCommitment(employee4, 9);
+        project3.addCommitment(employee5, 9);
+        assertEquals(2, pps.getFulltimeEmployees().size());
+    }
+
+    @Test
+    void calculateMostInvolvedEmployees(){
+        // employee three is in all projects in setup
+        assertTrue(pps.calculateMostInvolvedEmployees().contains(employee3));
+        // employee three should be the only one
+        assertFalse(pps.calculateMostInvolvedEmployees().contains(employee1));
+    }
+
+
 
 }
