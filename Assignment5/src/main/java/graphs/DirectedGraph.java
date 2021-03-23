@@ -7,16 +7,18 @@ import java.util.stream.Collectors;
 
 public class DirectedGraph<V extends DGVertex<E>, E extends DGEdge<V>> {
 
-    private Map<String,V> vertices = new HashMap<>();
+    private Map<String, V> vertices = new HashMap<>();
 
-    /** representation invariants:
-     1.  all vertices in the graph are unique by their implementation of the getId() method
-     2.  all edges in the graph reference vertices from and to which are true members of the vertices map
-     (i.e. by true object instance equality == and not just by identity equality from the getId() method)
-     3.  all edges of a vertex are outgoing edges, i.e. FOR ALL e in v.edges: e.from == v
+    /**
+     * representation invariants:
+     * 1.  all vertices in the graph are unique by their implementation of the getId() method
+     * 2.  all edges in the graph reference vertices from and to which are true members of the vertices map
+     * (i.e. by true object instance equality == and not just by identity equality from the getId() method)
+     * 3.  all edges of a vertex are outgoing edges, i.e. FOR ALL e in v.edges: e.from == v
      **/
 
-    public DirectedGraph() { }
+    public DirectedGraph() {
+    }
 
     public Collection<V> getVertices() {
         return this.vertices.values();
@@ -24,9 +26,10 @@ public class DirectedGraph<V extends DGVertex<E>, E extends DGEdge<V>> {
 
     /**
      * finds the vertex in the graph identified by the given id
-     * @param id
-     * @return  the vertex that matches the given id
-     *          return null if none of the vertices matches the id
+     *
+     * @param id the id of the vertex is set as the key in the map
+     * @return the vertex that matches the given id
+     * return null if none of the vertices matches the id
      */
     public V getVertexById(String id) {
         return this.vertices.get(id);
@@ -36,16 +39,16 @@ public class DirectedGraph<V extends DGVertex<E>, E extends DGEdge<V>> {
     /**
      * Adds newVertex to the graph, if not yet present and in a way that maintains the representation invariants.
      * If (a duplicate of) newVertex (with the same id) already exists in the graph,
-     *      nothing will be added, and the existing duplicate will be kept and returned.
+     * nothing will be added, and the existing duplicate will be kept and returned.
+     *
      * @param newVertex the vertex to add or return
-     * @return  the duplicate of newVertex with the same id that already existed in the graph,
-     *          or newVertex itself if it has been added.
+     * @return the duplicate of newVertex with the same id that already existed in the graph,
+     * or newVertex itself if it has been added.
      */
     public V addOrGetVertex(V newVertex) {
-        // TODO add and return the newVertex, or return the existing duplicate vertex
-        if (this.getVertexById(newVertex.getId()) == null){
+        // TODO add and return the newVertex, or return the existing duplicate vertex CHECK IF WORKS!
+        if (this.getVertexById(newVertex.getId()) == null) {
             this.vertices.put(newVertex.getId(), newVertex);
-            return this.getVertexById(newVertex.getId());
         }
         // a proper vertex shall be returned at all times
         return this.getVertexById(newVertex.getId());
@@ -53,10 +56,11 @@ public class DirectedGraph<V extends DGVertex<E>, E extends DGEdge<V>> {
 
     /**
      * Adds all newVertices to the graph, which are not present yet and and in a way that maintains the representation invariants.
-     * @param newVertices   an array of vertices to be added, provided as variable length argument list
-     * @return  the number of vertices that actually have been added.
+     *
+     * @param newVertices an array of vertices to be added, provided as variable length argument list
+     * @return the number of vertices that actually have been added.
      */
-    public int addVertices(V ...newVertices) {
+    public int addVertices(V... newVertices) {
         int count = 0;
         for (V v : newVertices) {
             if (v == this.addOrGetVertex(v)) {
@@ -71,26 +75,34 @@ public class DirectedGraph<V extends DGVertex<E>, E extends DGEdge<V>> {
      * Adds newEdge to the graph, if not yet present and in a way that maintains the representation invariants:
      * If any of the newEdge.from or newEdge.to vertices does not yet exist in the graph, it is added now.
      * If newEdge does not exist yet in the edges list of the newEdge.from vertex, it is added now,
-     *            otherwise no change is made to that list.
-     * @param newEdge   the new edge to be added in the edges list of newEdge.from
-     * @return  the duplicate of newEdge that already existed in the graph
-     *          or newEdge itselves if it just has been added.
-     * @throws  IllegalArgumentException if newEdge.from or newEdge.to are duplicate vertices that have not
-     *          been added to the graph yet have the same id as another vertex in the graph
+     * otherwise no change is made to that list.
+     *
+     * @param newEdge the new edge to be added in the edges list of newEdge.from
+     * @return the duplicate of newEdge that already existed in the graph
+     * or newEdge itselves if it just has been added.
+     * @throws IllegalArgumentException if newEdge.from or newEdge.to are duplicate vertices that have not
+     *                                  been added to the graph yet have the same id as another vertex in the graph
      */
     public E addOrGetEdge(E newEdge) {
-        // TODO add and return the newEdge, or return the existing duplicate edge or throw an exception
-
+        // add and return the newEdge, or return the existing duplicate edge or throw an exception
+        if (!vertices.containsKey(newEdge.getFrom().getId()) && getVertexById(newEdge.getFrom().getId()) != newEdge.getFrom()
+                || !vertices.containsKey(newEdge.getTo().getId()) && getVertexById(newEdge.getTo().getId()) != newEdge.getTo()) {
+            throw new IllegalArgumentException();
+        }
+        // add edges to vertex
+        this.addOrGetVertex(newEdge.getFrom()).getEdges().add(newEdge);
+        //this.addOrGetVertex(newEdge.getTo()).getEdges().add(newEdge);
         // a proper edge shall be returned at all times
-        return null;
+        return newEdge;
     }
 
     /**
      * Adds all newEdges to the graph, which are not present yet and in a way that maintains the representation invariants.
-     * @param newEdges   an array of vertices to be added, provides as variable length argument list
-     * @return  the number of edges that actually have been added.
+     *
+     * @param newEdges an array of vertices to be added, provides as variable length argument list
+     * @return the number of edges that actually have been added.
      */
-    public int addEdges(E ...newEdges) {
+    public int addEdges(E... newEdges) {
         int count = 0;
         for (E e : newEdges) {
             if (e == this.addOrGetEdge(e)) {
@@ -102,19 +114,20 @@ public class DirectedGraph<V extends DGVertex<E>, E extends DGEdge<V>> {
     }
 
     /**
-     * @return  the total number of vertices in the graph
+     * @return the total number of vertices in the graph
      */
     public int getNumVertices() {
         return this.vertices.size();
     }
 
     /**
-     * @return  the total number of edges in the graph
+     * @return the total number of edges in the graph
      */
     public int getNumEdges() {
-        // TODO calculate and return the total number of edges in the graph
-
-        return 0;
+        // calculate and return the total number of edges in the graph
+        return this.vertices.values()
+                .stream().mapToInt(v -> v.getEdges().size())
+                .sum();
     }
 
     /**
@@ -179,11 +192,12 @@ public class DirectedGraph<V extends DGVertex<E>, E extends DGEdge<V>> {
      * Uses a depth-first search algorithm to find a path from the start vertex to the target vertex in the graph
      * The path.totalWeight should indicate the number of edges in the result path
      * All vertices that are being visited by the search should also be registered in path.visited
+     *
      * @param startId
      * @param targetId
-     * @return  the path from start to target
-     *          returns null if either start or target cannot be matched with a vertex in the graph
-     *                          or no path can be found from start to target
+     * @return the path from start to target
+     * returns null if either start or target cannot be matched with a vertex in the graph
+     * or no path can be found from start to target
      */
     public DGPath depthFirstSearch(String startId, String targetId) {
 
@@ -212,11 +226,12 @@ public class DirectedGraph<V extends DGVertex<E>, E extends DGEdge<V>> {
      * Uses a breadth-first search algorithm to find a path from the start vertex to the target vertex in the graph
      * The path.totalWeight should indicate the number of edges in the result path
      * All vertices that are being visited by the search should also be registered in path.visited
+     *
      * @param startId
      * @param targetId
-     * @return  the path from start to target
-     *          returns null if either start or target cannot be matched with a vertex in the graph
-     *                          or no path can be found from start to target
+     * @return the path from start to target
+     * returns null if either start or target cannot be matched with a vertex in the graph
+     * or no path can be found from start to target
      */
     public DGPath breadthFirstSearch(String startId, String targetId) {
 
@@ -263,15 +278,16 @@ public class DirectedGraph<V extends DGVertex<E>, E extends DGEdge<V>> {
      * Calculates the edge-weighted shortest path from start to target
      * Uses a minimum distance heuristic from any vertex to the target
      * in order to reduce the number of visited vertices during the search
+     *
      * @param startId
      * @param targetId
-     * @param weightMapper    provides a function, by which the weight of an edge can be retrieved or calculated
-     * @return  the shortest path from start to target
-     *          returns null if either start or target cannot be matched with a vertex in the graph
-     *                          or no path can be found from start to target
+     * @param weightMapper provides a function, by which the weight of an edge can be retrieved or calculated
+     * @return the shortest path from start to target
+     * returns null if either start or target cannot be matched with a vertex in the graph
+     * or no path can be found from start to target
      */
     public DGPath dijkstraShortestPath(String startId, String targetId,
-                                       Function<E,Double> weightMapper) {
+                                       Function<E, Double> weightMapper) {
 
         V start = this.getVertexById(startId);
         V target = this.getVertexById(targetId);
@@ -329,18 +345,19 @@ public class DirectedGraph<V extends DGVertex<E>, E extends DGEdge<V>> {
      * Calculates the edge-weighted shortest path from start to target
      * Uses a minimum distance heuristic from any vertex to the target
      * in order to reduce the number of visited vertices during the search
+     *
      * @param startId
      * @param targetId
-     * @param weightMapper    provides a function, by which the weight of an edge can be retrieved or calculated
+     * @param weightMapper           provides a function, by which the weight of an edge can be retrieved or calculated
      * @param minimumWeightEstimator provides a function, by which a lower bound of the cumulative weight
-     *                        between two vertices can be calculated.
-     * @return  the shortest path from start to target
-     *          returns null if either start or target cannot be matched with a vertex in the graph
-     *                          or no path can be found from start to target
+     *                               between two vertices can be calculated.
+     * @return the shortest path from start to target
+     * returns null if either start or target cannot be matched with a vertex in the graph
+     * or no path can be found from start to target
      */
     public DGPath aStarShortestPath(String startId, String targetId,
-                                     Function<E,Double> weightMapper,
-                                     BiFunction<V,V,Double> minimumWeightEstimator ) {
+                                    Function<E, Double> weightMapper,
+                                    BiFunction<V, V, Double> minimumWeightEstimator) {
 
         V start = this.getVertexById(startId);
         V target = this.getVertexById(targetId);
@@ -358,8 +375,6 @@ public class DirectedGraph<V extends DGVertex<E>, E extends DGEdge<V>> {
         //  register all visited vertices while going, for statistical purposes
 
 
-
-
         // TODO END
         // no path found, graph was not connected ???
         return null;
@@ -367,15 +382,16 @@ public class DirectedGraph<V extends DGVertex<E>, E extends DGEdge<V>> {
 
     /**
      * Calculates the edge-weighted shortest path from start to target
+     *
      * @param startId
      * @param targetId
-     * @param weightMapper    provides a function by which the weight of an edge can be retrieved or calculated
-     * @return  the shortest path from start to target
-     *          returns null if either start or target cannot be matched with a vertex in the graph
-     *                          or no path can be found from start to target
+     * @param weightMapper provides a function by which the weight of an edge can be retrieved or calculated
+     * @return the shortest path from start to target
+     * returns null if either start or target cannot be matched with a vertex in the graph
+     * or no path can be found from start to target
      */
     public DGPath dijkstraShortestPathByAStar(String startId, String targetId,
-                                              Function<E,Double> weightMapper) {
+                                              Function<E, Double> weightMapper) {
         return aStarShortestPath(startId, targetId,
                 weightMapper,
                 // TODO provide a minimumWeightEstimator that makes A* run like regular Dijkstra
@@ -387,6 +403,6 @@ public class DirectedGraph<V extends DGVertex<E>, E extends DGEdge<V>> {
     public String toString() {
         return this.getVertices().stream()
                 .map(Object::toString)
-                .collect(Collectors.joining(",\n  ","{ ","\n}"));
+                .collect(Collectors.joining(",\n  ", "{ ", "\n}"));
     }
 }
