@@ -1,12 +1,14 @@
 package route_planner;
 
+import graphs.DGVertex;
+
 import java.io.PrintStream;
 import java.util.HashSet;
 import java.util.Locale;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-public class Junction
+public class Junction implements DGVertex<Road>
         // TODO extend superclass and/or implement interfaces
 {
     private String name;            // unique name of the junction
@@ -61,6 +63,16 @@ public class Junction
 
     public double getVariability() {
         return variability;
+    }
+
+    @Override
+    public String getId() {
+        return null;
+    }
+
+    @Override
+    public Set<Road> getEdges() {
+        return null;
     }
 
     /**

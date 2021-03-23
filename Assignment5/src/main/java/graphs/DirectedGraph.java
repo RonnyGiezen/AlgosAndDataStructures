@@ -37,15 +37,18 @@ public class DirectedGraph<V extends DGVertex<E>, E extends DGEdge<V>> {
      * Adds newVertex to the graph, if not yet present and in a way that maintains the representation invariants.
      * If (a duplicate of) newVertex (with the same id) already exists in the graph,
      *      nothing will be added, and the existing duplicate will be kept and returned.
-     * @param newVertex
+     * @param newVertex the vertex to add or return
      * @return  the duplicate of newVertex with the same id that already existed in the graph,
      *          or newVertex itself if it has been added.
      */
     public V addOrGetVertex(V newVertex) {
         // TODO add and return the newVertex, or return the existing duplicate vertex
-
+        if (this.getVertexById(newVertex.getId()) == null){
+            this.vertices.put(newVertex.getId(), newVertex);
+            return this.getVertexById(newVertex.getId());
+        }
         // a proper vertex shall be returned at all times
-        return null;
+        return this.getVertexById(newVertex.getId());
     }
 
     /**

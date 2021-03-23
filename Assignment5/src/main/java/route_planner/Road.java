@@ -1,9 +1,11 @@
 package route_planner;
 
+import graphs.DGEdge;
+
 import java.io.PrintStream;
 import java.util.Locale;
 
-public class Road
+public class Road implements DGEdge<Junction>
         // TODO extend superclass and/or implement interfaces
 {
     private String name;        // the name of the road segment
