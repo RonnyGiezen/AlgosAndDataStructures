@@ -79,19 +79,26 @@ public class DirectedGraph<V extends DGVertex<E>, E extends DGEdge<V>> {
      *
      * @param newEdge the new edge to be added in the edges list of newEdge.from
      * @return the duplicate of newEdge that already existed in the graph
-     * or newEdge itselves if it just has been added.
+     * or newEdge selves if it just has been added.
      * @throws IllegalArgumentException if newEdge.from or newEdge.to are duplicate vertices that have not
      *                                  been added to the graph yet have the same id as another vertex in the graph
      */
     public E addOrGetEdge(E newEdge) {
         // add and return the newEdge, or return the existing duplicate edge or throw an exception
-        if (!vertices.containsKey(newEdge.getFrom().getId()) && getVertexById(newEdge.getFrom().getId()) != newEdge.getFrom()
-                || !vertices.containsKey(newEdge.getTo().getId()) && getVertexById(newEdge.getTo().getId()) != newEdge.getTo()) {
+        if (newEdge.getFrom() != null && vertices.containsKey(newEdge.getFrom().getId()) && getVertexById(newEdge.getFrom().getId()) != newEdge.getFrom()
+        ) {
             throw new IllegalArgumentException();
+        }
+        if (newEdge.getTo() != null && vertices.containsKey(newEdge.getTo().getId()) && getVertexById(newEdge.getTo().getId()) != newEdge.getTo()
+        ) {
+            throw new IllegalArgumentException();
+        }
+        if (newEdge.getFrom().getEdges().stream().anyMatch(e -> e.equals(newEdge))){
+            return newEdge.getFrom().getEdges().stream().filter(e -> e.equals(newEdge)).findAny().get();
         }
         // add edges to vertex
         this.addOrGetVertex(newEdge.getFrom()).getEdges().add(newEdge);
-        //this.addOrGetVertex(newEdge.getTo()).getEdges().add(newEdge);
+        this.addOrGetVertex(newEdge.getTo());
         // a proper edge shall be returned at all times
         return newEdge;
     }
