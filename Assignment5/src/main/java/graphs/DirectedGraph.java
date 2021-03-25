@@ -192,6 +192,10 @@ public class DirectedGraph<V extends DGVertex<E>, E extends DGEdge<V>> {
         public Set<V> getVisited() {
             return visited;
         }
+
+        public void addWeight(double add) {
+            this.totalWeight += add;
+        }
     }
 
     /**
@@ -199,9 +203,9 @@ public class DirectedGraph<V extends DGVertex<E>, E extends DGEdge<V>> {
      * The path.totalWeight should indicate the number of edges in the result path
      * All vertices that are being visited by the search should also be registered in path.visited
      *
-     * @param startId the id of the start node
-     * @param targetId the id of the end node
-     * @return the path from start to target
+     * @param startId the id of the start Vertex
+     * @param targetId the id of the end Vertex
+     * @return the DGpath for the path from start to target
      * returns null if either start or target cannot be matched with a vertex in the graph
      * or no path can be found from start to target
      */
@@ -209,36 +213,46 @@ public class DirectedGraph<V extends DGVertex<E>, E extends DGEdge<V>> {
 
         V start = this.getVertexById(startId);
         V target = this.getVertexById(targetId);
+
+
+
         if (start == null || target == null) return null;
 
         DGPath path = new DGPath();
         path.start = start;
-        path.visited.add(start);
 
         // easy target
-        if (start == target) return path;
+        if (start == target) {
+            path.visited.add(start);
+            return path;
+        }
 
         // TODO calculate the path from start to target by recursive depth-first-search
         //  (create another private recursive helper method)
         //  register all visited vertices while going, for statistical purposes
         //  if you hit the target: complete the path and bail out !!!
-        if (!this.getVertices().contains(start) || !this.getVertices().contains(target)){
+
+
+        // no path found, graph was not connected ???
+        return dfsRecursive(start, target, path);
+    }
+
+    private DGPath dfsRecursive(V current, V target, DGPath path) {
+        if (path.getVisited().contains(current)) {
             return null;
         }
-
-        //dfsRecursive(path, start);
-        for (E edge : start.getEdges()){
-            path.visited.add(edge.getTo());
-            if (edge.getTo() == target){
+        path.getVisited().add(current);
+        if (current.equals(target)) {
+            return path;
+        }
+        for (E edge : current.getEdges()){
+            if (!path.getEdges().contains(edge)) {
+                path.getEdges().add(edge);
+            }
+            if (dfsRecursive(edge.getTo(), target, path) != null) {
                 return path;
             }
         }
-
-        // no path found, graph was not connected ???
-        return null;
-    }
-
-    private V dfsHelper(LinkedList<E> edges) {
         return null;
     }
 
@@ -268,7 +282,7 @@ public class DirectedGraph<V extends DGVertex<E>, E extends DGEdge<V>> {
         // easy target
         if (start == target) return path;
 
-        // TODO calculate the path from start to target by breadth-first-search
+        // calculate the path from start to target by breadth-first-search
         //  register all visited vertices while going, for statistical purposes
         //  if you hit the target: complete the path and bail out !!!
         Queue<V> fifoQueue = new LinkedList<>();
@@ -363,16 +377,25 @@ public class DirectedGraph<V extends DGVertex<E>, E extends DGEdge<V>> {
         progressData.put(start, nextDspNode);
 
         while (nextDspNode != null) {
-
             // TODO continue Dijkstra's algorithm to process nextDspNode
             //  mark nodes as you complete their processing
+            nextDspNode.marked = true;
+            progressData.putIfAbsent(nextDspNode.vertex, nextDspNode);
             //  register all visited vertices while going for statistical purposes
+            path.getVisited().add(nextDspNode.vertex);
             //  if you hit the target: complete the path and bail out !!!
+            if (nextDspNode.vertex.equals(target)){
+                while(nextDspNode.fromEdge != null){
+                    path.getEdges().add(nextDspNode.fromEdge);
+                    nextDspNode = new DSPNode(nextDspNode.fromEdge.getFrom());
+                }
+                return path;
+            }
 
 
             // TODO find the next nearest node that is not marked yet
             //  nextDspNode = progressData.values().stream()...
-            nextDspNode = null;
+            nextDspNode = progressData.values().stream().filter(d -> !d.marked).findFirst().orElse(null);
         }
 
         // no path found, graph was not connected ???
