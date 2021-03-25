@@ -65,16 +65,6 @@ public class Junction implements DGVertex<Road>
         return variability;
     }
 
-    @Override
-    public String getId() {
-        return null;
-    }
-
-    @Override
-    public Set<Road> getEdges() {
-        return null;
-    }
-
     /**
      * draws the junction onto an svg image with a given colour
      * @param svgWriter
@@ -127,4 +117,13 @@ public class Junction implements DGVertex<Road>
 
     // TODO more implementations as required for use with DirectedGraph, HashSet and/or HashMap
 
+    @Override
+    public String getId() {
+        return this.getName();
+    }
+
+    @Override
+    public Set<Road> getEdges() {
+        return this.roads;
+    }
 }

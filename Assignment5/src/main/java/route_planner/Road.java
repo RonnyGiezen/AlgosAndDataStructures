@@ -33,7 +33,7 @@ public class Road implements DGEdge<Junction>
         this(name, from, to);
         this.maxSpeed = maxSpeed;
         // fix the actual length of this road segment with some random variability
-        // compensating for lack of truely authentic data
+        // compensating for lack of truly authentic data
         this.length = from.getDistance(to) *
                 (1.05 + 0.1*(from.getVariability() + to.getVariability()));
     }
@@ -94,7 +94,7 @@ public class Road implements DGEdge<Junction>
         double width = 0.2 + this.maxSpeed * 0.008;
 
         // accounts for the reversed y-direction of the svg coordinate system relative to RD-coordinates
-        svgWriter.printf(Locale.ENGLISH, "<line x1='%.3f' y1='%.3f' x2='%.3f' y2='%.3f' stroke-width='%.3f' stroke='%s'/>\n",
+        svgWriter.printf(Locale.ENGLISH, "<line x1='%.3f' y1='%.3f' x2='%.3f' y2='%.3f' stroke-width='%.3f' stroke='%s'/>%n",
                 this.getFrom().getLocationX(), -this.getFrom().getLocationY(),
                 this.getTo().getLocationX(), -this.getTo().getLocationY(),
                 width, colour);

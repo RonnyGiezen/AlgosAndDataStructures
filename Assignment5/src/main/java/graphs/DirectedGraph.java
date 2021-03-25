@@ -46,7 +46,7 @@ public class DirectedGraph<V extends DGVertex<E>, E extends DGEdge<V>> {
      * or newVertex itself if it has been added.
      */
     public V addOrGetVertex(V newVertex) {
-        // TODO add and return the newVertex, or return the existing duplicate vertex CHECK IF WORKS!
+        // add and return the newVertex, or return the existing duplicate vertex
         if (this.getVertexById(newVertex.getId()) == null) {
             this.vertices.put(newVertex.getId(), newVertex);
         }
@@ -142,8 +142,7 @@ public class DirectedGraph<V extends DGVertex<E>, E extends DGEdge<V>> {
      */
     public void removeUnconnectedVertices() {
         Set<V> unconnected = new HashSet<>();
-
-        this.getVertices().stream().filter(v -> v.getEdges().size() == 0).forEach(unconnected::add);
+        this.getVertices().stream().filter(v -> v.getEdges().isEmpty()).forEach(unconnected::add);
         this.getVertices().stream().flatMap(v -> v.getEdges().stream().map(E::getTo)).forEach(unconnected::remove);
         unconnected.stream().map(V::getId).forEach(this.vertices::remove);
     }
@@ -200,8 +199,8 @@ public class DirectedGraph<V extends DGVertex<E>, E extends DGEdge<V>> {
      * The path.totalWeight should indicate the number of edges in the result path
      * All vertices that are being visited by the search should also be registered in path.visited
      *
-     * @param startId
-     * @param targetId
+     * @param startId the id of the start node
+     * @param targetId the id of the end node
      * @return the path from start to target
      * returns null if either start or target cannot be matched with a vertex in the graph
      * or no path can be found from start to target
@@ -223,11 +222,27 @@ public class DirectedGraph<V extends DGVertex<E>, E extends DGEdge<V>> {
         //  (create another private recursive helper method)
         //  register all visited vertices while going, for statistical purposes
         //  if you hit the target: complete the path and bail out !!!
+        if (!this.getVertices().contains(start) || !this.getVertices().contains(target)){
+            return null;
+        }
 
+        //dfsRecursive(path, start);
+        for (E edge : start.getEdges()){
+            path.visited.add(edge.getTo());
+            if (edge.getTo() == target){
+                return path;
+            }
+        }
 
         // no path found, graph was not connected ???
         return null;
     }
+
+    private V dfsHelper(LinkedList<E> edges) {
+        return null;
+    }
+
+
 
     /**
      * Uses a breadth-first search algorithm to find a path from the start vertex to the target vertex in the graph
@@ -256,6 +271,29 @@ public class DirectedGraph<V extends DGVertex<E>, E extends DGEdge<V>> {
         // TODO calculate the path from start to target by breadth-first-search
         //  register all visited vertices while going, for statistical purposes
         //  if you hit the target: complete the path and bail out !!!
+        Queue<V> fifoQueue = new LinkedList<>();
+        Map<V,V> visitedFrom = new HashMap<>();
+
+        fifoQueue.offer(start);
+        visitedFrom.put(start, null);
+
+        while (fifoQueue.size() > 0) {
+            V current = fifoQueue.poll();
+            for (E e : current.getEdges()) {
+                V neighbour = e.getTo();
+                path.visited.add(neighbour);
+                if (neighbour == target) {
+                    while (current != null) {
+                        path.getEdges().addLast(e);
+                        current = visitedFrom.get(current);
+                    }
+                    return path;
+                } else if (!visitedFrom.containsKey(neighbour)) {
+                    visitedFrom.put(neighbour,current);
+                    fifoQueue.offer(neighbour);
+                }
+            }
+        }
 
 
         // no path found, graph was not connected ???

@@ -92,6 +92,7 @@ class DirectedGraphTest {
         assertEquals(europe.getVertexById("UK"), path.getStart());
         assertTrue(path.getEdges().size() >= 2);
         assertTrue(path.getVisited().size() > path.getEdges().size());
+        System.out.println(path);
     }
 
     @Test
