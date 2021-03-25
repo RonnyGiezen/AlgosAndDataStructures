@@ -272,20 +272,27 @@ public class DirectedGraph<V extends DGVertex<E>, E extends DGEdge<V>> {
         //  register all visited vertices while going, for statistical purposes
         //  if you hit the target: complete the path and bail out !!!
         Queue<V> fifoQueue = new LinkedList<>();
-        Map<V,V> visitedFrom = new HashMap<>();
+        Map<V, V> visitedFrom = new HashMap<>();
+        Map<V, E> visitedEdge = new HashMap<>();
 
         fifoQueue.offer(start);
         visitedFrom.put(start, null);
 
-        while (fifoQueue.size() > 0) {
+        while (!fifoQueue.isEmpty()) {
+
             V current = fifoQueue.poll();
             for (E e : current.getEdges()) {
+
+                visitedEdge.put(e.getFrom(), e);
                 V neighbour = e.getTo();
                 path.visited.add(neighbour);
+
                 if (neighbour == target) {
+
                     while (current != null) {
-                        path.getEdges().addLast(e);
+                        path.getEdges().addFirst(visitedEdge.get(current));
                         current = visitedFrom.get(current);
+
                     }
                     return path;
                 } else if (!visitedFrom.containsKey(neighbour)) {

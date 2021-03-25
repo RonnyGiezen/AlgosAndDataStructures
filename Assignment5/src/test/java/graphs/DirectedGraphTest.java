@@ -115,6 +115,7 @@ class DirectedGraphTest {
         DirectedGraph.DGPath path = europe.breadthFirstSearch("UK","LUX");
         assertNotNull(path);
         assertEquals(europe.getVertexById("UK"), path.getStart());
+        System.out.println(path.getEdges().toString());
         assertEquals(2, path.getEdges().size());
         assertTrue(path.getVisited().size() > path.getEdges().size());
     }
