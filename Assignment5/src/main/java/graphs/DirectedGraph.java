@@ -210,15 +210,14 @@ public class DirectedGraph<V extends DGVertex<E>, E extends DGEdge<V>> {
      * or no path can be found from start to target
      */
     public DGPath depthFirstSearch(String startId, String targetId) {
-
+        // get node/vertex on ID
         V start = this.getVertexById(startId);
         V target = this.getVertexById(targetId);
-
-
-
+        // if they dont exist return null
         if (start == null || target == null) return null;
-
+        // create new path
         DGPath path = new DGPath();
+        // set starting node/vertex
         path.start = start;
 
         // easy target
@@ -227,29 +226,27 @@ public class DirectedGraph<V extends DGVertex<E>, E extends DGEdge<V>> {
             return path;
         }
 
-        // TODO calculate the path from start to target by recursive depth-first-search
-        //  (create another private recursive helper method)
-        //  register all visited vertices while going, for statistical purposes
-        //  if you hit the target: complete the path and bail out !!!
-
-
-        // no path found, graph was not connected ???
-        return dfsRecursive(start, target, path);
+        // return the recursive method with starting point, target and the path
+        return dfsRecursive(path.start, target, path);
     }
 
     private DGPath dfsRecursive(V current, V target, DGPath path) {
+        // if node/vertex is already visited we have no path
         if (path.getVisited().contains(current)) {
             return null;
         }
+        // add current node/vertex to visited set
         path.getVisited().add(current);
+        // if we reach the destination we return the path
         if (current.equals(target)) {
             return path;
         }
+        // else we go check all de edges connected to the vertex
         for (E edge : current.getEdges()){
-            if (!path.getEdges().contains(edge)) {
-                path.getEdges().add(edge);
-            }
+            // if there is a new path we continue recursive until destination is reached
             if (dfsRecursive(edge.getTo(), target, path) != null) {
+                // we add the edges as first in the set of edges to create the path
+                path.getEdges().addFirst(edge);
                 return path;
             }
         }
