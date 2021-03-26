@@ -193,9 +193,11 @@ public class DirectedGraph<V extends DGVertex<E>, E extends DGEdge<V>> {
             return visited;
         }
 
-        public void addWeight(double add) {
+        public void setTotalWeight(double add) {
             this.totalWeight += add;
         }
+
+        public void setEdges(LinkedList<E> edges) { this.edges = edges; }
     }
 
     /**
@@ -267,7 +269,7 @@ public class DirectedGraph<V extends DGVertex<E>, E extends DGEdge<V>> {
      * or no path can be found from start to target
      */
     public DGPath breadthFirstSearch(String startId, String targetId) {
-
+    // TODO add comments
         V start = this.getVertexById(startId);
         V target = this.getVertexById(targetId);
         if (start == null || target == null) return null;
@@ -312,8 +314,6 @@ public class DirectedGraph<V extends DGVertex<E>, E extends DGEdge<V>> {
                 }
             }
         }
-
-
         // no path found, graph was not connected ???
         return null;
     }
@@ -325,12 +325,13 @@ public class DirectedGraph<V extends DGVertex<E>, E extends DGEdge<V>> {
         public E fromEdge = null;        // the edge from the predecessor's vertex to this node's vertex
         public boolean marked = false;  // indicates DSP processing has been marked complete
         public double weightSumTo = Double.MAX_VALUE;   // sum of weights of current shortest path to this node's vertex
+        public DSPNode predecessor = null;
 
         public DSPNode(V vertex) {
             this.vertex = vertex;
         }
 
-        // comparable interface helps to find a node with the shortest current path, sofar
+        // comparable interface helps to find a node with the shortest current path, so far
         @Override
         public int compareTo(DSPNode dspv) {
             return Double.compare(this.weightSumTo, dspv.weightSumTo);
@@ -349,11 +350,14 @@ public class DirectedGraph<V extends DGVertex<E>, E extends DGEdge<V>> {
      * returns null if either start or target cannot be matched with a vertex in the graph
      * or no path can be found from start to target
      */
-    public DGPath dijkstraShortestPath(String startId, String targetId,
-                                       Function<E, Double> weightMapper) {
-
+    public DGPath dijkstraShortestPath(String startId, String targetId, Function<E, Double> weightMapper) {
         V start = this.getVertexById(startId);
         V target = this.getVertexById(targetId);
+        Map<V, DSPNode> progressData = new HashMap<>();
+        PriorityQueue<DSPNode> pqueue = new PriorityQueue<>();
+        Set<V> shortestPathFound = new HashSet<>();
+
+
         if (start == null || target == null) return null;
 
         // initialise the result path of the search
@@ -364,41 +368,74 @@ public class DirectedGraph<V extends DGVertex<E>, E extends DGEdge<V>> {
         // easy target
         if (start == target) return path;
 
-        // keep track of the DSP status of all visited nodes
-        // you may choose a different approach of tracking progress of the algorith, if you wish
-        Map<V, DSPNode> progressData = new HashMap<>();
 
         // initialise the progress of the start node
         DSPNode nextDspNode = new DSPNode(start);
         nextDspNode.weightSumTo = 0.0;
         progressData.put(start, nextDspNode);
 
-        while (nextDspNode != null) {
-            // TODO continue Dijkstra's algorithm to process nextDspNode
-            //  mark nodes as you complete their processing
-            nextDspNode.marked = true;
-            progressData.putIfAbsent(nextDspNode.vertex, nextDspNode);
-            //  register all visited vertices while going for statistical purposes
-            path.getVisited().add(nextDspNode.vertex);
-            //  if you hit the target: complete the path and bail out !!!
-            if (nextDspNode.vertex.equals(target)){
-                while(nextDspNode.fromEdge != null){
-                    path.getEdges().add(nextDspNode.fromEdge);
-                    nextDspNode = new DSPNode(nextDspNode.fromEdge.getFrom());
-                }
+        pqueue.add(nextDspNode);
+
+        while (!pqueue.isEmpty()) {
+            DSPNode dspNode = pqueue.poll();
+            V node = dspNode.vertex;
+            shortestPathFound.add(node);
+            path.getVisited().add(node);
+
+            if (node.equals(target)){
+                path.setEdges(buildDijkstraPath(dspNode));
+                path.setTotalWeight(dspNode.weightSumTo);
+                System.out.println(path.getEdges());
                 return path;
             }
 
+            // iterate over neighbors
+            Set<E> neighbors = node.getEdges();
+            for (E edge : neighbors) {
+                if (shortestPathFound.contains(edge.getTo())) {
+                    continue;
+                }
 
-            // TODO find the next nearest node that is not marked yet
-            //  nextDspNode = progressData.values().stream()...
-            nextDspNode = progressData.values().stream().filter(d -> !d.marked).findFirst().orElse(null);
+                double distance = weightMapper.apply(edge);
+                double totalDistance = dspNode.weightSumTo + distance;
+
+                // neighbor not discovered yet?
+                DSPNode dspNext = progressData.get(edge.getTo());
+                if (dspNext == null) {
+                    dspNext = new DSPNode(edge.getTo());
+                    dspNext.weightSumTo = totalDistance;
+                    dspNext.fromEdge = edge;
+                    dspNext.predecessor = dspNode;
+                    progressData.put(edge.getTo(), dspNext);
+                    pqueue.add(dspNext);
+                }
+
+                else if (totalDistance < dspNext.weightSumTo) {
+                    dspNext.weightSumTo = totalDistance;
+                    dspNext.predecessor = dspNode;
+
+                    // update queue
+                    pqueue.remove(dspNext);
+                    pqueue.add(dspNext);
+                }
+
+            }
         }
 
         // no path found, graph was not connected ???
         return null;
     }
 
+    private LinkedList<E> buildDijkstraPath(DSPNode dspNode) {
+        LinkedList<E> path = new LinkedList<>();
+        while (dspNode != null) {
+            if (dspNode.predecessor != null) {
+                path.addFirst(dspNode.fromEdge);
+            }
+            dspNode = dspNode.predecessor;
+        }
+        return path;
+    }
 
     // helper class to register the state of a vertex in A* shortest path algorithm
     private class ASNode extends DSPNode {
