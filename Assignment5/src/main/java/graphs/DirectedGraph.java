@@ -619,7 +619,7 @@ public class DirectedGraph<V extends DGVertex<E>, E extends DGEdge<V>> {
         return aStarShortestPath(startId, targetId,
                 weightMapper,
                 // a minimumWeightEstimator that makes A* run like regular Dijkstra
-                (v1, v2) -> weightMapper.apply(v1.getEdges().stream().filter(e -> e.getTo().equals(v2)).findFirst().orElse(null))
+                (v1, v2) -> depthFirstSearch(v1.getId(), v2.getId()).getTotalWeight()
         );
     }
 

@@ -19,20 +19,20 @@ public class RoadMap extends DirectedGraph<Junction, Road> {
 
     public RoadMap(String junctionsResource, String roadsResource) {
         this();
-        System.out.printf("\nImporting junctions and roads from %s and %s...\n",
-                junctionsResource, roadsResource);;
+        System.out.printf("%nImporting junctions and roads from %s and %s...%n",
+                junctionsResource, roadsResource);
         int nJunctions = importJunctions(junctionsResource);
         int nRoads = importRoads(roadsResource);
         this.removeUnconnectedVertices();
-        System.out.printf("%d junctions and %d bi-directional roads have been imported.\n",
+        System.out.printf("%d junctions and %d bi-directional roads have been imported.%n",
                 nJunctions, nRoads);
-        System.out.printf("%d junctions and %d one-way roads have been stored into the graph.\n",
+        System.out.printf("%d junctions and %d one-way roads have been stored into the graph.%n",
                 this.getNumVertices(), this.getNumEdges());
     }
 
     /**
-     * the randomizor is used to generate missing authentic data about the fysical length of roads.
-     * Repreducible results of calculations can be obtained by fixing the seed of the randomizer
+     * the randomizer is used to generate missing authentic data about the fysical length of roads.
+     * Reproducible results of calculations can be obtained by fixing the seed of the randomizer
      */
     public static Random randomizer = new Random();
     public static void reSeedRandomizer(long seed) {

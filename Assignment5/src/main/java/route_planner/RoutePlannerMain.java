@@ -2,6 +2,8 @@ package route_planner;
 
 import graphs.DirectedGraph;
 
+import java.util.Objects;
+
 public class RoutePlannerMain {
 
     public static void main(String[] args) {
@@ -32,20 +34,23 @@ public class RoutePlannerMain {
 
         // now we have an accident between Diemen and Weesp...
         // TODO change the roadMap such that max average speed from Diemen to Weesp is only 5 km/h
+        roadMap.depthFirstSearch("Diemen", "Weesp").getEdges()
+                .forEach(e -> e.setMaxSpeed(5));
+
 
 
         // find the fastest route avoiding the accident
         DirectedGraph.DGPath path =
                 roadMap.dijkstraShortestPathByAStar(FROM_ID, TO_ID,
                         // TODO provide an edgeWeightCalculator that yields the expected travel time for the road
-                        null
+                        e -> e.getLength() / e.getMaxSpeed()
                 );
         System.out.println("DijkstraByAStar-accident-Weesp: " + path);
         roadMap.svgDrawMap(String.format("DSPACC-%s-%s.svg", FROM_ID, TO_ID), path);
     }
 
     private static void doPathSearches(RoadMap roadMap, String fromId, String toId) {
-        System.out.printf("\nResults from path searches from %s to %s:\n", fromId, toId);
+        System.out.printf("%nResults from path searches from %s to %s:%n", fromId, toId);
         RoadMap.DGPath path;
 
         // find the routes by depth-first-search
@@ -75,24 +80,24 @@ public class RoutePlannerMain {
         path = roadMap.aStarShortestPath(fromId, toId,
                 Road::getLength,
                 // TODO provide a minimumWeightEstimator that yields the minimum distance between two Junctions
-                null
+                (v1, v2) -> roadMap.depthFirstSearch(v1.getName(), v2.getName()).getTotalWeight()
         );
         System.out.println("AStar-Shortest-Path: " + path);
         roadMap.svgDrawMap(String.format("ASSP-%s-%s.svg", fromId, toId), path);
         path = roadMap.aStarShortestPath(toId, fromId,
                 Road::getLength,
                 // TODO provide the same minimumWeightEstimator as above
-                null
+                (v1, v2) -> roadMap.depthFirstSearch(v1.getName(), v2.getName()).getTotalWeight()
         );
         System.out.println("AStar-Shortest-Path return: " + path);
 
         // find the routes by A* Shortest Path with minimum total travel time
         path = roadMap.aStarShortestPath(fromId, toId,
                 // TODO provide an edgeWeightCalculator that yields the expected travel time for the road
-                null,
+                e -> e.getLength() / e.getMaxSpeed(),
 
                 // TODO provide a heuristic that yields the minimum travel time between two Junctions (at 120 km/h)
-                null
+                (v1, v2) -> (roadMap.depthFirstSearch(v1.getName(), v2.getName()).getTotalWeight() / 120)
         );
         System.out.println("AStar-Fastest-Route: " + path);
         roadMap.svgDrawMap(String.format("ASFR-%s-%s.svg", fromId, toId), path);

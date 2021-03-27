@@ -8,9 +8,7 @@ import java.util.Locale;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-public class Junction implements DGVertex<Road>
-        // TODO extend superclass and/or implement interfaces
-{
+public class Junction implements DGVertex<Road> {
     private String name;            // unique name of the junction
     private double locationX;       // RD x-coordinate in km
     private double locationY;       // RD y-coordinate in km

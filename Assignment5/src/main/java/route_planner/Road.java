@@ -106,4 +106,5 @@ public class Road implements DGEdge<Junction>
     }
 
     // TODO more implementations as required for use with DirectedGraph, HashSet and/or HashMap
+
 }
