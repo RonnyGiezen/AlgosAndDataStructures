@@ -105,6 +105,6 @@ public class Road implements DGEdge<Junction>
         return this.to.getName() + "(" + this.name + ")";
     }
 
-    // TODO more implementations as required for use with DirectedGraph, HashSet and/or HashMap
+    // more implementations as required for use with DirectedGraph, HashSet and/or HashMap
 
 }

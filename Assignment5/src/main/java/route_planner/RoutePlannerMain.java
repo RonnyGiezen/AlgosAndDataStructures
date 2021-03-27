@@ -2,8 +2,6 @@ package route_planner;
 
 import graphs.DirectedGraph;
 
-import java.util.Objects;
-
 public class RoutePlannerMain {
 
     public static void main(String[] args) {
@@ -42,7 +40,7 @@ public class RoutePlannerMain {
         // find the fastest route avoiding the accident
         DirectedGraph.DGPath path =
                 roadMap.dijkstraShortestPathByAStar(FROM_ID, TO_ID,
-                        // TODO provide an edgeWeightCalculator that yields the expected travel time for the road
+                        // provide an edgeWeightCalculator that yields the expected travel time for the road
                         e -> e.getLength() / e.getMaxSpeed()
                 );
         System.out.println("DijkstraByAStar-accident-Weesp: " + path);
@@ -79,24 +77,24 @@ public class RoutePlannerMain {
         // find the routes by A* Shortest Path with minimum total length
         path = roadMap.aStarShortestPath(fromId, toId,
                 Road::getLength,
-                // TODO provide a minimumWeightEstimator that yields the minimum distance between two Junctions
+                // provide a minimumWeightEstimator that yields the minimum distance between two Junctions
                 (v1, v2) -> roadMap.depthFirstSearch(v1.getName(), v2.getName()).getTotalWeight()
         );
         System.out.println("AStar-Shortest-Path: " + path);
         roadMap.svgDrawMap(String.format("ASSP-%s-%s.svg", fromId, toId), path);
         path = roadMap.aStarShortestPath(toId, fromId,
                 Road::getLength,
-                // TODO provide the same minimumWeightEstimator as above
+                // provide the same minimumWeightEstimator as above
                 (v1, v2) -> roadMap.depthFirstSearch(v1.getName(), v2.getName()).getTotalWeight()
         );
         System.out.println("AStar-Shortest-Path return: " + path);
 
         // find the routes by A* Shortest Path with minimum total travel time
         path = roadMap.aStarShortestPath(fromId, toId,
-                // TODO provide an edgeWeightCalculator that yields the expected travel time for the road
+                // provide an edgeWeightCalculator that yields the expected travel time for the road
                 e -> e.getLength() / e.getMaxSpeed(),
 
-                // TODO provide a heuristic that yields the minimum travel time between two Junctions (at 120 km/h)
+                // provide a heuristic that yields the minimum travel time between two Junctions (at 120 km/h)
                 (v1, v2) -> (roadMap.depthFirstSearch(v1.getName(), v2.getName()).getTotalWeight() / 120)
         );
         System.out.println("AStar-Fastest-Route: " + path);

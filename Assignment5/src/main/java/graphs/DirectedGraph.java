@@ -93,7 +93,7 @@ public class DirectedGraph<V extends DGVertex<E>, E extends DGEdge<V>> {
         ) {
             throw new IllegalArgumentException();
         }
-        if (newEdge.getFrom().getEdges().stream().anyMatch(e -> e.equals(newEdge))){
+        if (newEdge.getFrom().getEdges().stream().anyMatch(e -> e.equals(newEdge))) {
             return newEdge.getFrom().getEdges().stream().filter(e -> e.equals(newEdge)).findAny().get();
         }
         // add edges to vertex
@@ -197,7 +197,9 @@ public class DirectedGraph<V extends DGVertex<E>, E extends DGEdge<V>> {
             this.totalWeight += add;
         }
 
-        public void setEdges(LinkedList<E> edges) { this.edges = edges; }
+        public void setEdges(LinkedList<E> edges) {
+            this.edges = edges;
+        }
     }
 
     /**
@@ -205,7 +207,7 @@ public class DirectedGraph<V extends DGVertex<E>, E extends DGEdge<V>> {
      * The path.totalWeight should indicate the number of edges in the result path
      * All vertices that are being visited by the search should also be registered in path.visited
      *
-     * @param startId the id of the start Vertex
+     * @param startId  the id of the start Vertex
      * @param targetId the id of the end Vertex
      * @return the DGpath for the path from start to target
      * returns null if either start or target cannot be matched with a vertex in the graph
@@ -244,7 +246,7 @@ public class DirectedGraph<V extends DGVertex<E>, E extends DGEdge<V>> {
             return path;
         }
         // else we go check all de edges connected to the vertex
-        for (E edge : current.getEdges()){
+        for (E edge : current.getEdges()) {
             // if there is a new path we continue recursive until destination is reached
             if (dfsRecursive(edge.getTo(), target, path) != null) {
                 // we add the edges as first in the set of edges to create the path
@@ -254,7 +256,6 @@ public class DirectedGraph<V extends DGVertex<E>, E extends DGEdge<V>> {
         }
         return null;
     }
-
 
 
     /**
@@ -269,7 +270,6 @@ public class DirectedGraph<V extends DGVertex<E>, E extends DGEdge<V>> {
      * or no path can be found from start to target
      */
     public DGPath breadthFirstSearch(String startId, String targetId) {
-    // TODO add comments
         V start = this.getVertexById(startId);
         V target = this.getVertexById(targetId);
         if (start == null || target == null) return null;
@@ -284,35 +284,48 @@ public class DirectedGraph<V extends DGVertex<E>, E extends DGEdge<V>> {
         // calculate the path from start to target by breadth-first-search
         //  register all visited vertices while going, for statistical purposes
         //  if you hit the target: complete the path and bail out !!!
-        Queue<V> fifoQueue = new LinkedList<>();
-        Map<V, V> visitedFrom = new HashMap<>();
-        Map<V, E> visitedEdge = new HashMap<>();
 
-        fifoQueue.offer(start);
+        // list of nodes to visit next
+        Queue<V> nextToVisit = new LinkedList<>();
+        // map of each nodes and where they are visited from
+        Map<V, V> visitedFrom = new HashMap<>();
+        // each node and from wich edge it has been visited
+        Map<V, E> visitedEdge = new HashMap<>();
+        // add the start node to visit next (to start)
+        nextToVisit.offer(start);
+        // visited from is null since its the first
         visitedFrom.put(start, null);
 
-        while (!fifoQueue.isEmpty()) {
-
-            V current = fifoQueue.poll();
+        // while there are nodes to visit do something
+        while (!nextToVisit.isEmpty()) {
+            // get current node from to visit
+            V current = nextToVisit.poll();
+            // for each next node do something
             for (E e : current.getEdges()) {
-
+                // add this edge to visited
                 visitedEdge.put(e.getFrom(), e);
+                // get neighbour
                 V neighbour = e.getTo();
+                // add to visited list
                 path.visited.add(neighbour);
-
+                // if the neighbour is the target we have it
                 if (neighbour == target) {
-
+                    // build path
                     while (current != null) {
                         path.getEdges().addFirst(visitedEdge.get(current));
                         current = visitedFrom.get(current);
 
                     }
                     return path;
+                    // else if neighbor is not visited from yet
                 } else if (!visitedFrom.containsKey(neighbour)) {
-                    visitedFrom.put(neighbour,current);
-                    fifoQueue.offer(neighbour);
+                    // put it in the map
+                    visitedFrom.put(neighbour, current);
+                    // add to next to visit
+                    nextToVisit.offer(neighbour);
                 }
             }
+
         }
         // no path found, graph was not connected ???
         return null;
@@ -388,7 +401,7 @@ public class DirectedGraph<V extends DGVertex<E>, E extends DGEdge<V>> {
             // add to visited for stats
             path.getVisited().add(vertex);
             // if we have the target we can stop
-            if (vertex.equals(target)){
+            if (vertex.equals(target)) {
                 // set the edges (path) in the path helper with builder method
                 path.setEdges(buildPath(dspNode));
                 // set the total weight
@@ -469,12 +482,14 @@ public class DirectedGraph<V extends DGVertex<E>, E extends DGEdge<V>> {
     private class ASNode extends DSPNode {
         // add and handle information for the minimumWeightEstimator
         private double estimatedCostToTarget;
+
         // enhance this constructor as required
         public ASNode(V vertex) {
             super(vertex);
             this.estimatedCostToTarget = Double.POSITIVE_INFINITY;
             calculateCostSum();
         }
+
         // calculate total cost with the heuristic
         private void calculateCostSum() {
             this.cost = this.weightSumTo + this.estimatedCostToTarget;
@@ -546,7 +561,7 @@ public class DirectedGraph<V extends DGVertex<E>, E extends DGEdge<V>> {
             // add to visited for stats
             path.getVisited().add(vertex);
             // if we have the target we can stop
-            if (vertex.equals(target)){
+            if (vertex.equals(target)) {
                 // set the edges (path) in the path helper with builder method
                 path.setEdges(buildPath(asNode));
                 // set the total weight

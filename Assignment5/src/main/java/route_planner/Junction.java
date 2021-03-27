@@ -75,9 +75,9 @@ public class Junction implements DGVertex<Road> {
         int fontSize = 3;
 
         // accounts for the reversed y-direction of the svg coordinate system relative to RD-coordinates
-        svgWriter.printf(Locale.ENGLISH,"<circle cx='%.3f' cy='%.3f' r='%.3f' fill='%s'/>\n",
+        svgWriter.printf(Locale.ENGLISH,"<circle cx='%.3f' cy='%.3f' r='%.3f' fill='%s'/>%n",
                 this.locationX, -this.locationY, radius, colour);
-        svgWriter.printf(Locale.ENGLISH,"<text x='%.3f' y='%.3f' font-size='%d' fill='%s' text-anchor='middle'>%s</text>\n",
+        svgWriter.printf(Locale.ENGLISH,"<text x='%.3f' y='%.3f' font-size='%d' fill='%s' text-anchor='middle'>%s</text>%n",
                 this.locationX, -this.locationY-1.3, fontSize, colour, this.name);
 
     }
@@ -113,7 +113,7 @@ public class Junction implements DGVertex<Road> {
         return Math.sqrt(dX*dX + dY*dY);
     }
 
-    // TODO more implementations as required for use with DirectedGraph, HashSet and/or HashMap
+    // more implementations as required for use with DirectedGraph, HashSet and/or HashMap
 
     @Override
     public String getId() {
