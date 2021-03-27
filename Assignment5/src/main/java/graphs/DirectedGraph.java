@@ -357,7 +357,7 @@ public class DirectedGraph<V extends DGVertex<E>, E extends DGEdge<V>> {
         PriorityQueue<DSPNode> pqueue = new PriorityQueue<>();
         Set<V> shortestPathFound = new HashSet<>();
 
-
+        // if target or start is null we can't calculate shortest path
         if (start == null || target == null) return null;
 
         // initialise the result path of the search
@@ -373,44 +373,61 @@ public class DirectedGraph<V extends DGVertex<E>, E extends DGEdge<V>> {
         DSPNode nextDspNode = new DSPNode(start);
         nextDspNode.weightSumTo = 0.0;
         progressData.put(start, nextDspNode);
-
+        // add start node to the queue
         pqueue.add(nextDspNode);
 
+        // while the queue is not empty we can calculate the path
         while (!pqueue.isEmpty()) {
+            // get the first node from the queue
             DSPNode dspNode = pqueue.poll();
-            V node = dspNode.vertex;
-            shortestPathFound.add(node);
-            path.getVisited().add(node);
-
-            if (node.equals(target)){
+            // get the Vertex from that queue
+            V vertex = dspNode.vertex;
+            // add the Vertex tot he "shortest path" for now
+            shortestPathFound.add(vertex);
+            // add to visited for stats
+            path.getVisited().add(vertex);
+            // if we have the target we can stop
+            if (vertex.equals(target)){
+                // set the edges (path) in the path helper with builder method
                 path.setEdges(buildDijkstraPath(dspNode));
+                // set the total weight
                 path.setTotalWeight(dspNode.weightSumTo);
-                System.out.println(path.getEdges());
                 return path;
             }
 
             // iterate over neighbors
-            Set<E> neighbors = node.getEdges();
+            // heretofore we need all the edges of the vertex
+            Set<E> neighbors = vertex.getEdges();
             for (E edge : neighbors) {
+                // if the vertex that the edge points to is already in shortestPath we dont have
+                // to do it again.
                 if (shortestPathFound.contains(edge.getTo())) {
                     continue;
                 }
-
+                // get the distance of the edge
                 double distance = weightMapper.apply(edge);
+                // get the total distance from the distance to this node + the distance of this edge
                 double totalDistance = dspNode.weightSumTo + distance;
 
-                // neighbor not discovered yet?
+                // neighbor not discovered/progressed yet?
                 DSPNode dspNext = progressData.get(edge.getTo());
                 if (dspNext == null) {
+                    // create a new node for the neighbor
                     dspNext = new DSPNode(edge.getTo());
+                    // set the weigth to this node
                     dspNext.weightSumTo = totalDistance;
+                    // set the edge this node came from
                     dspNext.fromEdge = edge;
+                    // set previous node
                     dspNext.predecessor = dspNode;
+                    // add to progressed
                     progressData.put(edge.getTo(), dspNext);
+                    // add to the queue
                     pqueue.add(dspNext);
                 }
-
+                // otherwise we check if the weight to is shorter/smaller
                 else if (totalDistance < dspNext.weightSumTo) {
+                    // set new weigth
                     dspNext.weightSumTo = totalDistance;
                     dspNext.predecessor = dspNode;
 
@@ -426,14 +443,24 @@ public class DirectedGraph<V extends DGVertex<E>, E extends DGEdge<V>> {
         return null;
     }
 
+    /**
+     * Build a path to the param node
+     *
+     * @param dspNode the final node where we want to build the path to
+     * @return the path to this node
+     */
     private LinkedList<E> buildDijkstraPath(DSPNode dspNode) {
+        // create a new linked list for this path
         LinkedList<E> path = new LinkedList<>();
+        // while the node is not null we trace back to start
+        // while adding the node to the list
         while (dspNode != null) {
             if (dspNode.predecessor != null) {
                 path.addFirst(dspNode.fromEdge);
             }
             dspNode = dspNode.predecessor;
         }
+        // when all back tracking is done we can return the path
         return path;
     }
 
