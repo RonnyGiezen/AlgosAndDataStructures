@@ -323,9 +323,10 @@ public class DirectedGraph<V extends DGVertex<E>, E extends DGEdge<V>> {
     private class DSPNode implements Comparable<DSPNode> {
         public V vertex;                // the graph vertex that is concerned with this DSPNode
         public E fromEdge = null;        // the edge from the predecessor's vertex to this node's vertex
-        public boolean marked = false;  // indicates DSP processing has been marked complete
         public double weightSumTo = Double.MAX_VALUE;   // sum of weights of current shortest path to this node's vertex
         public DSPNode predecessor = null;
+        // set the cost for this node
+        public double cost = this.weightSumTo;
 
         public DSPNode(V vertex) {
             this.vertex = vertex;
@@ -334,7 +335,7 @@ public class DirectedGraph<V extends DGVertex<E>, E extends DGEdge<V>> {
         // comparable interface helps to find a node with the shortest current path, so far
         @Override
         public int compareTo(DSPNode dspv) {
-            return Double.compare(this.weightSumTo, dspv.weightSumTo);
+            return Double.compare(this.cost, dspv.cost);
         }
     }
 
@@ -389,7 +390,7 @@ public class DirectedGraph<V extends DGVertex<E>, E extends DGEdge<V>> {
             // if we have the target we can stop
             if (vertex.equals(target)){
                 // set the edges (path) in the path helper with builder method
-                path.setEdges(buildDijkstraPath(dspNode));
+                path.setEdges(buildPath(dspNode));
                 // set the total weight
                 path.setTotalWeight(dspNode.weightSumTo);
                 return path;
@@ -449,7 +450,7 @@ public class DirectedGraph<V extends DGVertex<E>, E extends DGEdge<V>> {
      * @param dspNode the final node where we want to build the path to
      * @return the path to this node
      */
-    private LinkedList<E> buildDijkstraPath(DSPNode dspNode) {
+    private LinkedList<E> buildPath(DSPNode dspNode) {
         // create a new linked list for this path
         LinkedList<E> path = new LinkedList<>();
         // while the node is not null we trace back to start
@@ -466,14 +467,26 @@ public class DirectedGraph<V extends DGVertex<E>, E extends DGEdge<V>> {
 
     // helper class to register the state of a vertex in A* shortest path algorithm
     private class ASNode extends DSPNode {
-        // TODO add and handle information for the minimumWeightEstimator
-
-        // TODO enhance this constructor as required
-        private ASNode(V vertex) {
+        // add and handle information for the minimumWeightEstimator
+        private double estimatedCostToTarget;
+        // enhance this constructor as required
+        public ASNode(V vertex) {
             super(vertex);
+            this.estimatedCostToTarget = Double.POSITIVE_INFINITY;
+            calculateCostSum();
+        }
+        // calculate total cost with the heuristic
+        private void calculateCostSum() {
+            this.cost = this.weightSumTo + this.estimatedCostToTarget;
         }
 
-        // TODO override the compareTo
+        // override the compareTo
+        @Override
+        public int compareTo(DSPNode dspv) {
+            return super.compareTo(dspv);
+        }
+
+
     }
 
 
@@ -497,21 +510,96 @@ public class DirectedGraph<V extends DGVertex<E>, E extends DGEdge<V>> {
 
         V start = this.getVertexById(startId);
         V target = this.getVertexById(targetId);
+        Map<V, ASNode> progressData = new HashMap<>();
+        PriorityQueue<ASNode> pqueue = new PriorityQueue<>();
+        Set<V> shortestASPathFound = new HashSet<>();
+
+
         if (start == null || target == null) return null;
 
         DGPath path = new DGPath();
         path.start = start;
         path.visited.add(start);
 
+
+        // add start to the queue
+        // initialise the progress of the start node
+        ASNode nextASNode = new ASNode(start);
+        nextASNode.weightSumTo = 0.0;
+        // set the heuristic
+        nextASNode.estimatedCostToTarget = minimumWeightEstimator.apply(start, target);
+        progressData.put(start, nextASNode);
+        // add start node to the queue
+        pqueue.add(nextASNode);
+
         // easy target
         if (start == target) return path;
 
-        // TODO apply the A* algorithm to find shortest path from start to target.
-        //  take dijkstra's solution as the starting point and enhance with heuristic functionality
-        //  register all visited vertices while going, for statistical purposes
+        // while the queue is not empty we can calculate the path
+        while (!pqueue.isEmpty()) {
+            // get the first node from the queue
+            ASNode asNode = pqueue.poll();
+            // get the Vertex from that queue
+            V vertex = asNode.vertex;
+            // add the Vertex tot he "shortest path" for now
+            shortestASPathFound.add(vertex);
+            // add to visited for stats
+            path.getVisited().add(vertex);
+            // if we have the target we can stop
+            if (vertex.equals(target)){
+                // set the edges (path) in the path helper with builder method
+                path.setEdges(buildPath(asNode));
+                // set the total weight
+                path.setTotalWeight(asNode.weightSumTo);
+                return path;
+            }
 
+            // iterate over neighbors
+            // heretofore we need all the edges of the vertex
+            Set<E> neighbors = vertex.getEdges();
+            for (E edge : neighbors) {
+                // if the vertex that the edge points to is already in shortestPath we dont have
+                // to do it again.
+                if (shortestASPathFound.contains(edge.getTo())) {
+                    continue;
+                }
+                // get the distance of the edge
+                double distance = weightMapper.apply(edge);
+                // get the total distance from the distance to this node + the distance of this edge
+                double totalDistance = asNode.weightSumTo + distance;
 
-        // TODO END
+                // neighbor not discovered/progressed yet?
+                ASNode asNext = progressData.get(edge.getTo());
+                if (asNext == null) {
+                    // create a new node for the neighbor
+                    asNext = new ASNode(edge.getTo());
+                    // set the weigth to this node
+                    asNext.weightSumTo = totalDistance;
+                    // set the edge this node came from
+                    asNext.fromEdge = edge;
+                    // set previous node
+                    asNext.predecessor = asNode;
+                    // set heuristic
+                    asNext.estimatedCostToTarget = minimumWeightEstimator.apply(edge.getTo(), target);
+                    // add to progressed
+                    progressData.put(edge.getTo(), asNext);
+                    // add to the queue
+                    pqueue.add(asNext);
+                }
+                // otherwise we check if the weight to is shorter/smaller
+                else if (totalDistance < asNext.weightSumTo) {
+                    // set new weigth
+                    asNext.weightSumTo = totalDistance;
+                    asNext.predecessor = asNode;
+
+                    // update queue
+                    pqueue.remove(asNext);
+                    pqueue.add(asNext);
+                }
+
+            }
+        }
+
         // no path found, graph was not connected ???
         return null;
     }
@@ -530,8 +618,8 @@ public class DirectedGraph<V extends DGVertex<E>, E extends DGEdge<V>> {
                                               Function<E, Double> weightMapper) {
         return aStarShortestPath(startId, targetId,
                 weightMapper,
-                // TODO provide a minimumWeightEstimator that makes A* run like regular Dijkstra
-                null
+                // a minimumWeightEstimator that makes A* run like regular Dijkstra
+                (v1, v2) -> weightMapper.apply(v1.getEdges().stream().filter(e -> e.getTo().equals(v2)).findFirst().orElse(null))
         );
     }
 
