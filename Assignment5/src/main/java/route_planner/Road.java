@@ -5,9 +5,7 @@ import graphs.DGEdge;
 import java.io.PrintStream;
 import java.util.Locale;
 
-public class Road implements DGEdge<Junction>
-        // TODO extend superclass and/or implement interfaces
-{
+public class Road implements DGEdge<Junction> {
     private String name;        // the name of the road segment
     private Junction from;      // the junction where this road segment starts
     private Junction to;        // the junction where this road segment ends

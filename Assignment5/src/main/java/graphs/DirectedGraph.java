@@ -263,8 +263,8 @@ public class DirectedGraph<V extends DGVertex<E>, E extends DGEdge<V>> {
      * The path.totalWeight should indicate the number of edges in the result path
      * All vertices that are being visited by the search should also be registered in path.visited
      *
-     * @param startId
-     * @param targetId
+     * @param startId  start node to get path from
+     * @param targetId end node to get path to
      * @return the path from start to target
      * returns null if either start or target cannot be matched with a vertex in the graph
      * or no path can be found from start to target
@@ -296,6 +296,7 @@ public class DirectedGraph<V extends DGVertex<E>, E extends DGEdge<V>> {
         // visited from is null since its the first
         visitedFrom.put(start, null);
 
+
         // while there are nodes to visit do something
         while (!nextToVisit.isEmpty()) {
             // get current node from to visit
@@ -308,7 +309,7 @@ public class DirectedGraph<V extends DGVertex<E>, E extends DGEdge<V>> {
                 V neighbour = e.getTo();
                 // add to visited list
                 path.visited.add(neighbour);
-                // if the neighbour is the target we have it
+                // if the neighbour is the target we can stop and build the path
                 if (neighbour == target) {
                     // build path
                     while (current != null) {
@@ -317,7 +318,7 @@ public class DirectedGraph<V extends DGVertex<E>, E extends DGEdge<V>> {
 
                     }
                     return path;
-                    // else if neighbor is not visited from yet
+                    // else if neighbor is not visited from yet we can add it to nextToVisit
                 } else if (!visitedFrom.containsKey(neighbour)) {
                     // put it in the map
                     visitedFrom.put(neighbour, current);
@@ -337,9 +338,8 @@ public class DirectedGraph<V extends DGVertex<E>, E extends DGEdge<V>> {
         public V vertex;                // the graph vertex that is concerned with this DSPNode
         public E fromEdge = null;        // the edge from the predecessor's vertex to this node's vertex
         public double weightSumTo = Double.MAX_VALUE;   // sum of weights of current shortest path to this node's vertex
-        public DSPNode predecessor = null;
-        // set the cost for this node
-        public double cost = this.weightSumTo;
+        public DSPNode predecessor = null; // the predecessor of this node
+        public double cost = this.weightSumTo; // set the cost for this node so we can compare on cost (helps for Astar)
 
         public DSPNode(V vertex) {
             this.vertex = vertex;
@@ -357,8 +357,8 @@ public class DirectedGraph<V extends DGVertex<E>, E extends DGEdge<V>> {
      * Uses a minimum distance heuristic from any vertex to the target
      * in order to reduce the number of visited vertices during the search
      *
-     * @param startId
-     * @param targetId
+     * @param startId      node to start with
+     * @param targetId     node for when to stop and find the path for
      * @param weightMapper provides a function, by which the weight of an edge can be retrieved or calculated
      * @return the shortest path from start to target
      * returns null if either start or target cannot be matched with a vertex in the graph
@@ -402,7 +402,7 @@ public class DirectedGraph<V extends DGVertex<E>, E extends DGEdge<V>> {
             path.getVisited().add(vertex);
             // if we have the target we can stop
             if (vertex.equals(target)) {
-                // set the edges (path) in the path helper with builder method
+                // set the edges (path) in the path helper class with builder method
                 path.setEdges(buildPath(dspNode));
                 // set the total weight
                 path.setTotalWeight(dspNode.weightSumTo);
@@ -410,8 +410,9 @@ public class DirectedGraph<V extends DGVertex<E>, E extends DGEdge<V>> {
             }
 
             // iterate over neighbors
-            // heretofore we need all the edges of the vertex
+            // heretofore we need all the edges of the vertex to process them
             Set<E> neighbors = vertex.getEdges();
+            // for each edge that points to a next node
             for (E edge : neighbors) {
                 // if the vertex that the edge points to is already in shortestPath we dont have
                 // to do it again.
@@ -428,7 +429,7 @@ public class DirectedGraph<V extends DGVertex<E>, E extends DGEdge<V>> {
                 if (dspNext == null) {
                     // create a new node for the neighbor
                     dspNext = new DSPNode(edge.getTo());
-                    // set the weigth to this node
+                    // set the weight to this node
                     dspNext.weightSumTo = totalDistance;
                     // set the edge this node came from
                     dspNext.fromEdge = edge;
@@ -441,7 +442,7 @@ public class DirectedGraph<V extends DGVertex<E>, E extends DGEdge<V>> {
                 }
                 // otherwise we check if the weight to is shorter/smaller
                 else if (totalDistance < dspNext.weightSumTo) {
-                    // set new weigth
+                    // set new weight
                     dspNext.weightSumTo = totalDistance;
                     dspNext.predecessor = dspNode;
 
@@ -481,7 +482,7 @@ public class DirectedGraph<V extends DGVertex<E>, E extends DGEdge<V>> {
     // helper class to register the state of a vertex in A* shortest path algorithm
     private class ASNode extends DSPNode {
         // add and handle information for the minimumWeightEstimator
-        private double estimatedCostToTarget;
+        private double estimatedCostToTarget; // the total estimated cost from this to the target
 
         // enhance this constructor as required
         public ASNode(V vertex) {
@@ -491,6 +492,7 @@ public class DirectedGraph<V extends DGVertex<E>, E extends DGEdge<V>> {
         }
 
         // calculate total cost with the heuristic
+        // cost for a start is the cost is had plus the estimated cost left to the target
         private void calculateCostSum() {
             this.cost = this.weightSumTo + this.estimatedCostToTarget;
         }
@@ -500,8 +502,6 @@ public class DirectedGraph<V extends DGVertex<E>, E extends DGEdge<V>> {
         public int compareTo(DSPNode dspv) {
             return super.compareTo(dspv);
         }
-
-
     }
 
 
@@ -510,8 +510,8 @@ public class DirectedGraph<V extends DGVertex<E>, E extends DGEdge<V>> {
      * Uses a minimum distance heuristic from any vertex to the target
      * in order to reduce the number of visited vertices during the search
      *
-     * @param startId
-     * @param targetId
+     * @param startId                id of the node tot start with
+     * @param targetId               if of the target we are trying to find the path for
      * @param weightMapper           provides a function, by which the weight of an edge can be retrieved or calculated
      * @param minimumWeightEstimator provides a function, by which a lower bound of the cumulative weight
      *                               between two vertices can be calculated.
@@ -525,13 +525,13 @@ public class DirectedGraph<V extends DGVertex<E>, E extends DGEdge<V>> {
 
         V start = this.getVertexById(startId);
         V target = this.getVertexById(targetId);
-        Map<V, ASNode> progressData = new HashMap<>();
-        PriorityQueue<ASNode> pqueue = new PriorityQueue<>();
-        Set<V> shortestASPathFound = new HashSet<>();
+        Map<V, ASNode> progressData = new HashMap<>(); // hashmap for stats
+        PriorityQueue<ASNode> pqueue = new PriorityQueue<>(); // que that sorts the nodes on cost
+        Set<V> shortestASPathFound = new HashSet<>(); // set to keep track of the current shortest path
 
-
+        // if the start of target are null we cant calculate path
         if (start == null || target == null) return null;
-
+        // set start node
         DGPath path = new DGPath();
         path.start = start;
         path.visited.add(start);
@@ -601,9 +601,9 @@ public class DirectedGraph<V extends DGVertex<E>, E extends DGEdge<V>> {
                     // add to the queue
                     pqueue.add(asNext);
                 }
-                // otherwise we check if the weight to is shorter/smaller
+                // otherwise we check if the cost is shorter/smaller
                 else if (totalDistance < asNext.weightSumTo) {
-                    // set new weigth
+                    // set new cost
                     asNext.weightSumTo = totalDistance;
                     asNext.predecessor = asNode;
 
@@ -611,10 +611,8 @@ public class DirectedGraph<V extends DGVertex<E>, E extends DGEdge<V>> {
                     pqueue.remove(asNext);
                     pqueue.add(asNext);
                 }
-
             }
         }
-
         // no path found, graph was not connected ???
         return null;
     }

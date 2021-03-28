@@ -31,10 +31,9 @@ public class RoutePlannerMain {
         doPathSearches(roadMap, FROM_ID, TO_ID);
 
         // now we have an accident between Diemen and Weesp...
-        // TODO change the roadMap such that max average speed from Diemen to Weesp is only 5 km/h
+        // change the roadMap such that max average speed from Diemen to Weesp is only 5 km/h
         roadMap.depthFirstSearch("Diemen", "Weesp").getEdges()
                 .forEach(e -> e.setMaxSpeed(5));
-
 
 
         // find the fastest route avoiding the accident

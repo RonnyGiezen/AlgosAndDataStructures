@@ -154,7 +154,7 @@ public class RoadMap extends DirectedGraph<Junction, Road> {
             // header for an .svg file
             svgWriter.println("<?xml version='1.0' standalone='no'?>");
             // configure the viewBox to match the coordinate ranges of the Dutch RD-coordinate system
-            svgWriter.printf("<svg width='20cm' height='30cm' viewBox='%d %d %d %d' preserveAspectRatio='xMidYMin'\n",
+            svgWriter.printf("<svg width='20cm' height='30cm' viewBox='%d %d %d %d' preserveAspectRatio='xMidYMin'%n",
                     0, -625, 300, 300);
             svgWriter.println("     version='1.1' xmlns='http://www.w3.org/2000/svg'>");
 
