@@ -295,6 +295,8 @@ public class DirectedGraph<V extends DGVertex<E>, E extends DGEdge<V>> {
         nextToVisit.offer(start);
         // visited from is null since its the first
         visitedFrom.put(start, null);
+        // set visitedEdge
+        visitedEdge.put(start, null);
 
 
         // while there are nodes to visit do something
@@ -302,26 +304,33 @@ public class DirectedGraph<V extends DGVertex<E>, E extends DGEdge<V>> {
             // get current node from to visit
             V current = nextToVisit.poll();
             // for each next node do something
+
+            // if current is target
+            if (current == target) {
+                // build path
+                while (current != null) {
+                    if (visitedEdge.get(current) != null) {
+                        path.getEdges().addFirst(visitedEdge.get(current));
+                    }
+                    current = visitedFrom.get(current);
+
+                }
+                return path;
+            }
+
             for (E e : current.getEdges()) {
                 // add this edge to visited
-                visitedEdge.put(e.getFrom(), e);
+
                 // get neighbour
                 V neighbour = e.getTo();
                 // add to visited list
                 path.visited.add(neighbour);
                 // if the neighbour is the target we can stop and build the path
-                if (neighbour == target) {
-                    // build path
-                    while (current != null) {
-                        path.getEdges().addFirst(visitedEdge.get(current));
-                        current = visitedFrom.get(current);
-
-                    }
-                    return path;
-                    // else if neighbor is not visited from yet we can add it to nextToVisit
-                } else if (!visitedFrom.containsKey(neighbour)) {
-                    // put it in the map
+                if (!visitedFrom.containsKey(neighbour)) {
+                    // put it in the map for visited from
                     visitedFrom.put(neighbour, current);
+                    // put in the map for visited from edge
+                    visitedEdge.put(neighbour, e);
                     // add to next to visit
                     nextToVisit.offer(neighbour);
                 }
