@@ -303,7 +303,6 @@ public class DirectedGraph<V extends DGVertex<E>, E extends DGEdge<V>> {
         while (!nextToVisit.isEmpty()) {
             // get current node from to visit
             V current = nextToVisit.poll();
-            // for each next node do something
 
             // if current is target
             if (current == target) {
@@ -317,7 +316,7 @@ public class DirectedGraph<V extends DGVertex<E>, E extends DGEdge<V>> {
                 }
                 return path;
             }
-
+            // for each next node do something
             for (E e : current.getEdges()) {
                 // add this edge to visited
 
