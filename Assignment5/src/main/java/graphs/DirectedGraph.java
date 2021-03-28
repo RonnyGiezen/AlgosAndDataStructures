@@ -324,7 +324,7 @@ public class DirectedGraph<V extends DGVertex<E>, E extends DGEdge<V>> {
                 V neighbour = e.getTo();
                 // add to visited list
                 path.visited.add(neighbour);
-                // if the neighbour is the target we can stop and build the path
+                // if the neighbour is not visited
                 if (!visitedFrom.containsKey(neighbour)) {
                     // put it in the map for visited from
                     visitedFrom.put(neighbour, current);
